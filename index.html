@@ -19,12 +19,20 @@
       padding: 40px 20px;
     }
 
-    img.avatar {
-      width: 120px;
-      height: 120px;
+    #contentWrapper {
+      max-width: 700px;
+      width: 100%;
+      /* no padding-bottom here, it will be added dynamically */
+    }
+
+    .avatar {
+      width: 128px;
+      height: 128px;
       border-radius: 50%;
       margin-bottom: 20px;
-      box-shadow: 0 0 15px #7289da;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     h1 {
@@ -38,21 +46,19 @@
       font-size: 1.2rem;
       margin-bottom: 30px;
       color: #b9bbbe;
-      max-width: 600px;
     }
 
     .btn-container {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 15px;
-      margin-bottom: 40px;
-      width: 220px;
+      margin-bottom: 20px;
     }
 
     .btn {
-      width: 100%;
-      padding: 14px 0;
+      display: inline-block;
+      padding: 14px 40px;
       background-color: #7289da;
       color: white;
       text-decoration: none;
@@ -62,9 +68,7 @@
       box-shadow: 0 6px 10px rgba(114, 137, 218, 0.4);
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      display: block;
-      text-align: center;
-      user-select: none;
+      white-space: nowrap;
     }
 
     .btn:hover {
@@ -73,16 +77,17 @@
     }
 
     footer {
-      margin-top: auto;
       font-size: 0.9rem;
       color: #72767d;
-      padding-top: 20px;
+      margin-top: auto;
+      text-align: center;
+      line-height: 1.6;
     }
 
     footer a {
-      color: #72767d;
-      margin: 0 10px;
+      color: #7289da;
       text-decoration: none;
+      margin: 0 8px;
     }
 
     footer a:hover {
@@ -90,64 +95,96 @@
     }
 
     @media (max-width: 480px) {
-      img.avatar {
-        width: 90px;
-        height: 90px;
-      }
       h1 {
         font-size: 2.2rem;
       }
-      .btn-container {
-        width: 100%;
-        align-items: center;
-      }
       .btn {
-        width: 90%;
+        width: 100%;
         max-width: 300px;
+        box-sizing: border-box;
+      }
+      .btn-container {
+        gap: 10px;
       }
     }
   </style>
 </head>
 <body>
 
-  <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Discord Bot Avatar" class="avatar" />
+  <div id="contentWrapper">
+    <img
+      src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif"
+      alt="Jarvis Discord Bot Avatar"
+      class="avatar"
+    />
 
-  <h1>Jarvis Discord Bot</h1>
-  <p class="description">
-    The best bot for your Discord server — easy to use, packed with features, and always reliable.
-  </p>
+    <h1>Jarvis Discord Bot</h1>
+    <p class="description">
+      The best bot for your Discord server — easy to use, packed with features, and always reliable.
+    </p>
 
-  <div class="btn-container" id="btnContainer">
-    <!-- Buttons will be created here dynamically -->
+    <div class="btn-container" id="btnContainer"></div>
   </div>
 
   <footer>
     &copy; 2025 Jarvis Discord Bot
     <br />
-    <a href="https://jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a> | 
+    <a href="https://jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a> |
     <a href="https://jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
   </footer>
 
   <script>
-    const links = {
-      "Invite Bot": "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855",
-      "Dashboard": "https://dash.jarvisdiscordbot.net/",
-      "Support": "https://discord.com/invite/WW4eNQj9qr",
-      "Commands": "https://dash.jarvisdiscordbot.net/commands",
-      "Status": "https://dash.jarvisdiscordbot.net/status"
-    };
+    // Dynamic buttons data
+    const buttons = [
+      {
+        text: "Invite Bot",
+        href: "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      },
+      {
+        text: "Dashboard",
+        href: "https://dash.jarvisdiscordbot.net/",
+        target: "_self"
+      },
+      {
+        text: "Support",
+        href: "https://discord.com/invite/WW4eNQj9qr",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      },
+      {
+        text: "Commands",
+        href: "https://dash.jarvisdiscordbot.net/commands",
+        target: "_self"
+      }
+    ];
 
+    // Add buttons dynamically
     const container = document.getElementById('btnContainer');
-
-    for (const [text, url] of Object.entries(links)) {
+    buttons.forEach(btn => {
       const a = document.createElement('a');
-      a.textContent = text;
-      a.href = url;
       a.className = 'btn';
-      a.target = url.startsWith('http') ? '_blank' : '_self';
-      a.rel = url.startsWith('http') ? 'noopener noreferrer' : '';
+      a.textContent = btn.text;
+      a.href = btn.href;
+      if (btn.target) a.target = btn.target;
+      if (btn.rel) a.rel = btn.rel;
       container.appendChild(a);
-    }
+    });
+
+    // Adjust bottom padding of contentWrapper based on footer height
+    window.addEventListener('load', () => {
+      const footer = document.querySelector('footer');
+      const contentWrapper = document.getElementById('contentWrapper');
+      if (footer && contentWrapper) {
+        const footerStyle = getComputedStyle(footer);
+        const footerHeight =
+          footer.offsetHeight +
+          parseInt(footerStyle.marginTop) +
+          parseInt(footerStyle.marginBottom);
+        contentWrapper.style.paddingBottom = footerHeight + 20 + 'px'; // 20px extra space
+      }
+    });
   </script>
 
 </body>
