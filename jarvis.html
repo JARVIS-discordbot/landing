@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jarvis Discord Bot — Landing Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #23272a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    img.avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px #7289da;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7289da;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    p.description {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #b9bbbe;
+      max-width: 600px;
+    }
+
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Align buttons left */
+      gap: 15px;
+      margin-bottom: 40px;
+      width: 220px; /* Fixed width for alignment */
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 0;
+      background-color: #7289da;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      box-shadow: 0 6px 10px rgba(114, 137, 218, 0.4);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background-color: #5b6eae;
+      box-shadow: 0 8px 14px rgba(91, 110, 174, 0.5);
+    }
+
+    footer {
+      margin-top: auto;
+      font-size: 0.9rem;
+      color: #72767d;
+      padding-top: 20px;
+    }
+
+    @media (max-width: 480px) {
+      img.avatar {
+        width: 90px;
+        height: 90px;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      .btn-container {
+        width: 100%;
+        align-items: center;
+      }
+      .btn {
+        width: 90%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Discord Bot Avatar" class="avatar" />
+
+  <h1>Jarvis Discord Bot</h1>
+  <p class="description">
+    The best bot for your Discord server — easy to use, packed with features, and always reliable.
+  </p>
+
+  <div class="btn-container">
+    <a 
+      href="https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="btn"
+    >
+      Invite Bot
+    </a>
+
+    <a href="https://dash.jarvisdiscordbot.net/" class="btn">Dashboard</a>
+    <a href="https://discord.com/invite/WW4eNQj9qr" class="btn">Support</a>
+    <a href="https://dash.jarvisdiscordbot.net/commands" class="btn">Commands</a>
+    <a href="https://status.jarvisdiscordbot.net/" class="btn">Status</a>
+  </div>
+
+  <footer>
+    &copy; 2025 Jarvis Discord Bot
+  </footer>
+
+</body>
+</html>
