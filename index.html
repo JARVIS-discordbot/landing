@@ -44,10 +44,10 @@
     .btn-container {
       display: flex;
       flex-direction: column;
-      align-items: flex-start; /* Align buttons left */
+      align-items: flex-start;
       gap: 15px;
       margin-bottom: 40px;
-      width: 220px; /* Fixed width for alignment */
+      width: 220px;
     }
 
     .btn {
@@ -97,6 +97,18 @@
       }
     }
   </style>
+
+  <!-- Link config: update these URLs here to change all buttons -->
+  <script>
+    const links = {
+      invite: "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855",
+      dashboard: "/",
+      support: "https://discord.com/invite/WW4eNQj9qr",
+      commands: "/commands",
+      status: "/status"
+    };
+  </script>
+
 </head>
 <body>
 
@@ -108,24 +120,25 @@
   </p>
 
   <div class="btn-container">
-    <a 
-      href="https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      class="btn"
-    >
-      Invite Bot
-    </a>
-
-    <a href="https://dash.jarvisdiscordbot.net/" class="btn">Dashboard</a>
-    <a href="https://discord.com/invite/WW4eNQj9qr" class="btn">Support</a>
-    <a href="https://dash.jarvisdiscordbot.net/commands" class="btn">Commands</a>
-    <a href="https://status.jarvisdiscordbot.net/" class="btn">Status</a>
+    <a id="inviteBtn" class="btn" target="_blank" rel="noopener noreferrer">Invite Bot</a>
+    <a id="dashboardBtn" class="btn">Dashboard</a>
+    <a id="supportBtn" class="btn" target="_blank" rel="noopener noreferrer">Support</a>
+    <a id="commandsBtn" class="btn">Commands</a>
+    <a id="statusBtn" class="btn">Status</a>
   </div>
 
   <footer>
     &copy; 2025 Jarvis Discord Bot
   </footer>
+
+  <script>
+    // Apply the links from the config above
+    document.getElementById('inviteBtn').href = links.invite;
+    document.getElementById('dashboardBtn').href = links.dashboard;
+    document.getElementById('supportBtn').href = links.support;
+    document.getElementById('commandsBtn').href = links.commands;
+    document.getElementById('statusBtn').href = links.status;
+  </script>
 
 </body>
 </html>
