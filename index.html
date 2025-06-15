@@ -79,6 +79,16 @@
       padding-top: 20px;
     }
 
+    footer a {
+      color: #72767d;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
     @media (max-width: 480px) {
       img.avatar {
         width: 90px;
@@ -113,6 +123,9 @@
 
   <footer>
     &copy; 2025 Jarvis Discord Bot
+    <br />
+    <a href="https://jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a> | 
+    <a href="https://jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
   </footer>
 
   <script>
@@ -131,8 +144,8 @@
       a.textContent = text;
       a.href = url;
       a.className = 'btn';
-      a.target = (url.startsWith('http') ? '_blank' : '_self');
-      a.rel = (url.startsWith('http') ? 'noopener noreferrer' : '');
+      a.target = url.startsWith('http') ? '_blank' : '_self';
+      a.rel = url.startsWith('http') ? 'noopener noreferrer' : '';
       container.appendChild(a);
     }
   </script>
