@@ -5,26 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jarvis Discord Bot &mdash; Landing Page</title>
 
-  <!-- SEO Meta Tags -->
   <meta name="description" content="Jarvis Discord Bot &mdash; The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
   <meta name="keywords" content="Discord bot, Jarvis bot, Discord moderation, commands, dashboard" />
   <meta name="author" content="Jarvis Discord Bot Team" />
 
-  <!-- Open Graph / Facebook -->
   <meta property="og:title" content="Jarvis Discord Bot &mdash; Landing Page" />
   <meta property="og:description" content="The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jarvisdiscordbot.net/" />
   <meta property="og:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Jarvis Discord Bot &mdash; Landing Page" />
   <meta name="twitter:description" content="The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable." />
   <meta name="twitter:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
 
   <link rel="icon" href="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" type="image/gif" />
-  
+
   <style>
     body {
       margin: 0;
@@ -69,16 +66,16 @@
     }
 
     .btn-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
       margin-bottom: 20px;
     }
 
     .btn {
       display: inline-block;
-      padding: 14px 40px;
+      width: 100%;
+      padding: 14px 0;
       background-color: #7289da;
       color: white;
       text-decoration: none;
@@ -88,7 +85,8 @@
       box-shadow: 0 6px 10px rgba(114, 137, 218, 0.4);
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
     }
 
     .btn:hover {
@@ -118,12 +116,8 @@
       h1 {
         font-size: 2.2rem;
       }
-      .btn {
-        width: 100%;
-        max-width: 300px;
-        box-sizing: border-box;
-      }
       .btn-container {
+        grid-template-columns: 1fr;
         gap: 10px;
       }
     }
@@ -154,7 +148,6 @@
   </footer>
 
   <script>
-    // Dynamic buttons data
     const buttons = [
       {
         text: "Invite Bot",
@@ -185,13 +178,12 @@
         rel: "noopener noreferrer"
       },
       {
-        text: "donate",
+        text: "Donate",
         href: "https://buymeacoffee.com/bencos18",
         target: "_self"
       }
     ];
 
-    // Add buttons dynamically
     const container = document.getElementById('btnContainer');
     buttons.forEach(btn => {
       const a = document.createElement('a');
@@ -203,7 +195,6 @@
       container.appendChild(a);
     });
 
-    // Adjust bottom padding of contentWrapper based on footer height
     window.addEventListener('load', () => {
       const footer = document.querySelector('footer');
       const contentWrapper = document.getElementById('contentWrapper');
@@ -213,12 +204,10 @@
           footer.offsetHeight +
           parseInt(footerStyle.marginTop) +
           parseInt(footerStyle.marginBottom);
-        contentWrapper.style.paddingBottom = footerHeight + 20 + 'px'; // 20px extra space
+        contentWrapper.style.paddingBottom = footerHeight + 20 + 'px';
       }
     });
   </script>
 
 </body>
 </html>
-
-
