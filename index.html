@@ -21,7 +21,7 @@
   <meta name="twitter:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
 
   <link rel="icon" href="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" type="image/gif" />
-<iframe src="https://discord.com/widget?id=833376882896142393&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+
   <style>
     body {
       margin: 0;
@@ -112,6 +112,16 @@
       text-decoration: underline;
     }
 
+    .discord-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
     @media (max-width: 480px) {
       h1 {
         font-size: 2.2rem;
@@ -119,6 +129,9 @@
       .btn-container {
         grid-template-columns: 1fr;
         gap: 10px;
+      }
+      .discord-widget {
+        display: none;
       }
     }
   </style>
@@ -146,6 +159,17 @@
     <a href="https://dash.jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a> |
     <a href="https://dash.jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
   </footer>
+
+  <div class="discord-widget">
+    <iframe
+      src="https://discord.com/widget?id=833376882896142393&theme=dark"
+      width="350"
+      height="500"
+      allowtransparency="true"
+      frameborder="0"
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+    </iframe>
+  </div>
 
   <script>
     const buttons = [
