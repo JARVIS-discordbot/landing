@@ -9,6 +9,8 @@
   <meta name="keywords" content="Discord bot, Jarvis bot, Discord moderation, commands, dashboard" />
   <meta name="author" content="Jarvis Discord Bot Team" />
 
+  <link rel="canonical" href="https://jarvisdiscordbot.net/" />
+
   <meta property="og:title" content="Jarvis Discord Bot &mdash; Landing Page" />
   <meta property="og:description" content="The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable." />
   <meta property="og:type" content="website" />
@@ -57,6 +59,13 @@
       color: #7289da;
       margin-bottom: 10px;
       letter-spacing: 1px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #7289da;
+      margin-bottom: 20px;
+      font-weight: 400;
     }
 
     p.description {
@@ -126,6 +135,9 @@
       h1 {
         font-size: 2.2rem;
       }
+      h2 {
+        font-size: 1.3rem;
+      }
       .btn-container {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -141,6 +153,7 @@
   <div class="discord-widget">
     <iframe src="https://discord.com/widget?id=833376882896142393&theme=dark"
       width="350" height="500" allowtransparency="true" frameborder="0"
+      loading="lazy"
       sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
     </iframe>
   </div>
@@ -153,6 +166,7 @@
     />
 
     <h1>Jarvis Discord Bot</h1>
+    <h2>Your Ultimate Discord Companion</h2>
     <p class="description">
       The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable.
     </p>
@@ -163,8 +177,8 @@
   <footer>
     &copy; 2025 Jarvis Discord Bot
     <br />
-    <a href="https://dash.jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a> |
-    <a href="https://dash.jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+    <a href="https://dash.jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer" aria-label="Read our Terms of Service">Terms of Service</a> |
+    <a href="https://dash.jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer" aria-label="Read our Privacy Policy">Privacy Policy</a>
   </footer>
 
   <script>
@@ -173,34 +187,40 @@
         text: "Invite Bot",
         href: "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855",
         target: "_blank",
-        rel: "noopener noreferrer"
+        rel: "noopener noreferrer",
+        ariaLabel: "Invite Jarvis Bot to your Discord server"
       },
       {
         text: "Dashboard",
         href: "https://dash.jarvisdiscordbot.net/",
-        target: "_self"
+        target: "_self",
+        ariaLabel: "Access Jarvis Bot dashboard"
       },
       {
         text: "Support",
         href: "https://discord.com/invite/WW4eNQj9qr",
         target: "_blank",
-        rel: "noopener noreferrer"
+        rel: "noopener noreferrer",
+        ariaLabel: "Join our Discord support server"
       },
       {
         text: "Commands",
         href: "https://dash.jarvisdiscordbot.net/commands",
-        target: "_self"
+        target: "_self",
+        ariaLabel: "View all available bot commands"
       },
       {
         text: "Status Page",
         href: "https://status.jarvisdiscordbot.net/",
         target: "_blank",
-        rel: "noopener noreferrer"
+        rel: "noopener noreferrer",
+        ariaLabel: "Check Jarvis Bot service status"
       },
       {
         text: "Donate",
         href: "https://buymeacoffee.com/bencos18",
-        target: "_self"
+        target: "_self",
+        ariaLabel: "Support Jarvis Bot development"
       }
     ];
 
@@ -212,6 +232,7 @@
       a.href = btn.href;
       if (btn.target) a.target = btn.target;
       if (btn.rel) a.rel = btn.rel;
+      if (btn.ariaLabel) a.setAttribute('aria-label', btn.ariaLabel);
       container.appendChild(a);
     });
 
