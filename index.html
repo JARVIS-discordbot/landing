@@ -172,6 +172,37 @@
     </p>
 
     <div class="btn-container" id="btnContainer"></div>
+    
+    <!-- Airplanes.live fixed note -->
+    <div class="airplanes-note">
+      <span style="color: #7289da; font-weight: bold;">Note:</span> Jarvis Discord Bot uses data from
+      <a href="https://airplanes.live" target="_blank" rel="noopener noreferrer">airplanes.live</a>.
+      <span style="font-weight: 400;">Learn more.</span>
+    </div>
+    <style>
+      .airplanes-note {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: #2c2f36;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(114,137,218,0.15);
+        padding: 16px 22px;
+        border-left: 5px solid #7289da;
+        text-align: left;
+        max-width: 320px;
+        line-height: 1.5;
+      }
+      @media (max-width: 600px) {
+        .airplanes-note {
+          display: none;
+        }
+      }
+    </style>
   </div>
 
   <footer>
