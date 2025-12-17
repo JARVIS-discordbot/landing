@@ -8,7 +8,6 @@
   <meta name="description" content="Jarvis Discord Bot &mdash; The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
   <meta name="keywords" content="Discord bot, Jarvis bot, Discord moderation, commands, dashboard" />
   <meta name="author" content="Jarvis Discord Bot Team" />
-
   <link rel="canonical" href="https://jarvisdiscordbot.net/" />
 
   <meta property="og:title" content="Jarvis Discord Bot &mdash; Landing Page" />
@@ -25,22 +24,7 @@
   <link rel="icon" href="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" type="image/gif" />
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-  
-    /* Startup Fame badge */
-    .startupfame-badge {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-    }
-  </style>
-  
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -60,487 +44,76 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 20% 80%, rgba(114, 137, 218, 0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 20%, rgba(114, 137, 218, 0.08) 0%, transparent 50%);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(114,137,218,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(114,137,218,0.08) 0%, transparent 50%);
       z-index: -1;
       animation: backgroundPulse 8s ease-in-out infinite;
     }
 
-    @keyframes backgroundPulse {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
+    @keyframes backgroundPulse { 0%,100%{opacity:0.8;}50%{opacity:1;} }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0);} }
+    @keyframes float {0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);} }
+    @keyframes glow {0%,100%{box-shadow:0 0 20px rgba(114,137,218,0.4);}50%{box-shadow:0 0 30px rgba(114,137,218,0.6);} }
+    @keyframes gradientShift {0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+    @keyframes slideInLeft {from{opacity:0;transform:translateX(-100px);}to{opacity:1;transform:translateX(0);}}
+    @keyframes particleFloat {0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100px) rotate(360deg);opacity:0;}}
+    @keyframes slideInDown {from{opacity:0;transform:translateY(-100%);}to{opacity:1;transform:translateY(0);}}
+
+    #contentWrapper { max-width:700px;width:100%; animation:fadeInUp 1s ease-out; margin:60px 0; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+    .avatar { width:140px;height:140px;border-radius:50%;margin-bottom:30px;border:4px solid rgba(114,137,218,0.3); animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite; transition: transform 0.3s ease; }
+    .avatar:hover { transform: scale(1.05); }
+
+    h1 { font-size:3.5rem; background:linear-gradient(45deg,#7289da,#5865f2,#7289da); background-size:200% 200%; background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; letter-spacing:2px; font-weight:700; animation:gradientShift 3s ease-in-out infinite;}
+    h2 { font-size:1.8rem; color:#a3b3ff; margin-bottom:25px; font-weight:400; opacity:0.9; }
+    p.description { font-size:1.3rem; margin-bottom:40px; color:#c9d1f0; line-height:1.6; max-width:600px; margin-left:auto; margin-right:auto; }
+
+    .btn-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px; margin-bottom:50px; max-width:900px; width:100%; }
+    .btn { display:flex; align-items:center; justify-content:center; width:100%; padding:20px 24px; background:linear-gradient(135deg,#7289da 0%,#5865f2 100%); color:#fff; font-weight:700; font-size:1.15rem; border-radius:14px; box-shadow:0 8px 25px rgba(114,137,218,0.3); transition:all 0.3s ease; cursor:pointer; text-align:center; position:relative; overflow:hidden; border:2px solid transparent; min-height:60px; text-decoration:none; }
+    .btn::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transition:left 0.5s; }
+    .btn:hover::before { left:100%; }
+    .btn:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 12px 35px rgba(114,137,218,0.4); border-color:rgba(255,255,255,0.2); }
+    .btn:active { transform:translateY(-1px) scale(1.01); }
+
+    footer { font-size:0.95rem; color:#8892b0; text-align:center; line-height:1.8; background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); margin-top:60px; position:relative; z-index:10; }
+    footer a { color:#7289da; text-decoration:none; margin:0 10px; transition:color 0.3s ease; }
+    footer a:hover { color:#5865f2; text-decoration:underline; }
+
+    .airplanes-note { position:fixed; top:90px; left:25px; z-index:1001; background:linear-gradient(135deg, rgba(44,47,54,0.95) 0%, rgba(32,34,37,0.95) 100%); color:#fff; font-size:1.1rem; font-weight:600; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.3); padding:18px 24px; border:1px solid rgba(114,137,218,0.3); text-align:left; max-width:340px; line-height:1.6; backdrop-filter:blur(10px); animation:slideInLeft 0.5s ease-out; }
+    .airplanes-note a { color:#7289da; font-weight:bold; text-decoration:none; transition:color 0.3s ease; }
+    .airplanes-note a:hover { color:#5865f2; text-decoration:underline; }
+
+    .particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1; }
+    .particle { position:absolute; width:4px; height:4px; background:rgba(114,137,218,0.3); border-radius:50%; animation:particleFloat 15s linear infinite; }
+
+    .navbar { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(26,26,46,0.95); backdrop-filter:blur(20px); border-bottom:1px solid rgba(114,137,218,0.2); padding:0; animation:slideInDown 0.6s ease-out;}
+    .nav-container { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:15px 20px; }
+    .nav-logo { display:flex; align-items:center; gap:12px; font-size:1.4rem; font-weight:700; color:#fff; }
+    .nav-avatar { width:40px; height:40px; border-radius:50%; border:2px solid rgba(114,137,218,0.3); transition:transform 0.3s ease; }
+    .nav-avatar:hover { transform:scale(1.1); }
+    .nav-links { display:flex; gap:30px; align-items:center; }
+    .nav-link { color:#c9d1f0; text-decoration:none; font-weight:500; font-size:1rem; padding:8px 16px; border-radius:8px; position:relative; overflow:hidden; transition:all 0.3s ease; }
+    .nav-link::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, rgba(114,137,218,0.1), transparent); transition:left 0.5s; }
+    .nav-link:hover::before { left:100%; }
+    .nav-link:hover { color:#7289da; background:rgba(114,137,218,0.1); transform:translateY(-2px); }
+    .nav-toggle { display:none; flex-direction:column; cursor:pointer; padding:4px; }
+    .nav-toggle span { width:25px; height:3px; background:#7289da; margin:3px 0; border-radius:2px; transition:0.3s;}
+    .nav-toggle.active span:nth-child(1){transform:rotate(-45deg) translate(-5px,6px);}
+    .nav-toggle.active span:nth-child(2){opacity:0;}
+    .nav-toggle.active span:nth-child(3){transform:rotate(45deg) translate(-5px,-6px);}
+
+    @media(max-width:768px){
+      h1{font-size:2.8rem;} h2{font-size:1.5rem;} 
+      .btn-container{grid-template-columns:1fr;gap:20px;max-width:100%;}
+      .btn{padding:18px 20px;font-size:1.1rem;min-height:56px;}
+      .airplanes-note{display:none;} .avatar{width:120px;height:120px;}
+      .nav-links{position:fixed;top:70px;left:0;right:0;background:rgba(26,26,46,0.98);backdrop-filter:blur(20px);flex-direction:column;padding:20px;gap:15px;transform:translateY(-100%);opacity:0;visibility:hidden;transition:all 0.3s ease;border-bottom:1px solid rgba(114,137,218,0.2);}
+      .nav-links.active{transform:translateY(0);opacity:1;visibility:visible;}
+      .nav-toggle{display:flex;} .nav-link{width:100%;text-align:center;padding:12px;border:1px solid rgba(114,137,218,0.2);}
     }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    @keyframes glow {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(114, 137, 218, 0.4);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(114, 137, 218, 0.6);
-      }
-    }
-
-    #contentWrapper {
-      max-width: 700px;
-      width: 100%;
-      animation: fadeInUp 1s ease-out;
-      margin: 60px 0 60px 0;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      margin-bottom: 30px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      border: 4px solid rgba(114, 137, 218, 0.3);
-      animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite;
-      transition: transform 0.3s ease;
-    }
-
-    .avatar:hover {
-      transform: scale(1.05);
-    }
-
-    h1 {
-      font-size: 3.5rem;
-      background: linear-gradient(45deg, #7289da, #5865f2, #7289da);
-      background-size: 200% 200%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 15px;
-      letter-spacing: 2px;
-      font-weight: 700;
-      animation: gradientShift 3s ease-in-out infinite;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    h2 {
-      font-size: 1.8rem;
-      color: #a3b3ff;
-      margin-bottom: 25px;
-      font-weight: 400;
-      opacity: 0.9;
-    }
-
-    p.description {
-      font-size: 1.3rem;
-      margin-bottom: 40px;
-      color: #c9d1f0;
-      line-height: 1.6;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .btn-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      margin-bottom: 50px;
-      max-width: 900px;
-      width: 100%;
-    }
-
-    .btn {
-      display: inline-block;
-      width: 100%;
-      padding: 20px 24px;
-      background: linear-gradient(135deg, #7289da 0%, #5865f2 100%);
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 1.15rem;
-      border-radius: 14px;
-      box-shadow: 0 8px 25px rgba(114, 137, 218, 0.3);
-      transition: all 0.3s ease;
-      cursor: pointer;
-      text-align: center;
-      box-sizing: border-box;
-      position: relative;
-      overflow: hidden;
-      border: 2px solid transparent;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    .btn:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(114, 137, 218, 0.4);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .btn:active {
-      transform: translateY(-1px) scale(1.01);
-    }
-
-    footer {
-      font-size: 0.95rem;
-      color: #8892b0;
-      text-align: center;
-      line-height: 1.8;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 60px;
-      position: relative;
-      z-index: 10;
-    }
-
-    footer a {
-      color: #7289da;
-      text-decoration: none;
-      margin: 0 10px;
-      transition: color 0.3s ease;
-    }
-
-    footer a:hover {
-      color: #5865f2;
-      text-decoration: underline;
-    }
-
-    .airplanes-note {
-      position: fixed;
-      top: 90px;
-      left: 25px;
-      z-index: 1001;
-      background: linear-gradient(135deg, rgba(44, 47, 54, 0.95) 0%, rgba(32, 34, 37, 0.95) 100%);
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 15px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      padding: 18px 24px;
-      border: 1px solid rgba(114, 137, 218, 0.3);
-      text-align: left;
-      max-width: 340px;
-      line-height: 1.6;
-      backdrop-filter: blur(10px);
-      animation: slideInLeft 0.5s ease-out;
-    }
-
-    @keyframes slideInLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-100px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .airplanes-note a {
-      color: #7289da;
-      font-weight: bold;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .airplanes-note a:visited {
-      color: #7289da;
-    }
-
-    .airplanes-note a:hover {
-      color: #5865f2;
-      text-decoration: underline;
-    }
-
-    /* Floating particles effect */
-    .particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: rgba(114, 137, 218, 0.3);
-      border-radius: 50%;
-      animation: particleFloat 15s linear infinite;
-    }
-
-    @keyframes particleFloat {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-100px) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* Navigation Bar Styles */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: rgba(26, 26, 46, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(114, 137, 218, 0.2);
-      padding: 0;
-      animation: slideInDown 0.6s ease-out;
-    }
-
-    @keyframes slideInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-100%);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 20px;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #fff;
-      text-decoration: none;
-    }
-
-    .nav-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(114, 137, 218, 0.3);
-      transition: transform 0.3s ease;
-    }
-
-    .nav-avatar:hover {
-      transform: scale(1.1);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .nav-link {
-      color: #c9d1f0;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1rem;
-      padding: 8px 16px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nav-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(114, 137, 218, 0.1), transparent);
-      transition: left 0.5s;
-    }
-
-    .nav-link:hover::before {
-      left: 100%;
-    }
-
-    .nav-link:hover {
-      color: #7289da;
-      background: rgba(114, 137, 218, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .nav-toggle {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    .nav-toggle span {
-      width: 25px;
-      height: 3px;
-      background: #7289da;
-      margin: 3px 0;
-      transition: 0.3s;
-      border-radius: 2px;
-    }
-
-    .nav-toggle.active span:nth-child(1) {
-      transform: rotate(-45deg) translate(-5px, 6px);
-    }
-
-    .nav-toggle.active span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .nav-toggle.active span:nth-child(3) {
-      transform: rotate(45deg) translate(-5px, -6px);
-    }
-
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2.8rem;
-      }
-      h2 {
-        font-size: 1.5rem;
-      }
-      .btn-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        max-width: 100%;
-      }
-
-      .btn {
-        padding: 18px 20px;
-        font-size: 1.1rem;
-        min-height: 56px;
-      }
-      .airplanes-note {
-        display: none;
-      }
-      .avatar {
-        width: 120px;
-        height: 120px;
-      }
-
-      .nav-links {
-        position: fixed;
-        top: 70px;
-        left: 0;
-        right: 0;
-        background: rgba(26, 26, 46, 0.98);
-        backdrop-filter: blur(20px);
-        flex-direction: column;
-        padding: 20px;
-        gap: 15px;
-        transform: translateY(-100%);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        border-bottom: 1px solid rgba(114, 137, 218, 0.2);
-      }
-
-      .nav-links.active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .nav-toggle {
-        display: flex;
-      }
-
-      .nav-link {
-        width: 100%;
-        text-align: center;
-        padding: 12px;
-        border: 1px solid rgba(114, 137, 218, 0.2);
-        border-radius: 8px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 2.4rem;
-      }
-      h2 {
-        font-size: 1.3rem;
-      }
-      p.description {
-        font-size: 1.1rem;
-      }
-      body {
-        padding: 100px 15px 40px;
-      }
-
-      #contentWrapper {
-        margin: 40px 0 80px 0;
-      }
-    }
+    @media(max-width:480px){ h1{font-size:2.4rem;} h2{font-size:1.3rem;} p.description{font-size:1.1rem;} body{padding:100px 15px 40px;} #contentWrapper{margin:40px 0 80px 0;} }
   </style>
 </head>
 <body>
@@ -567,17 +140,10 @@
   </nav>
 
   <div id="contentWrapper">
-    <img
-      src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif"
-      alt="Jarvis Discord Bot Avatar"
-      class="avatar"
-    />
-
+    <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Discord Bot Avatar" class="avatar">
     <h1>Jarvis Discord Bot</h1>
     <h2>Your Ultimate Discord Companion</h2>
-    <p class="description">
-      The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable.
-    </p>
+    <p class="description">The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable.</p>
 
     <div class="btn-container" id="btnContainer"></div>
 
@@ -597,142 +163,20 @@
 
   <script>
     const buttons = [
-      {
-        text: "Invite Bot",
-        href: "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855",
-        target: "_blank",
-        rel: "noopener noreferrer",
-        ariaLabel: "Invite Jarvis Bot to your Discord server"
-      },
-      {
-        text: "Dashboard",
-        href: "https://dash.jarvisdiscordbot.net/",
-        target: "_self",
-        ariaLabel: "Access Jarvis Bot dashboard"
-      },
-      {
-        text: "Support",
-        href: "https://discord.com/invite/WW4eNQj9qr",
-        target: "_blank",
-        rel: "noopener noreferrer",
-        ariaLabel: "Join our Discord support server"
-      },
-      {
-        text: "Commands",
-        href: "https://dash.jarvisdiscordbot.net/commands",
-        target: "_self",
-        ariaLabel: "View all available bot commands"
-      },
-      {
-        text: "Status Page",
-        href: "https://status.jarvisdiscordbot.net/",
-        target: "_blank",
-        rel: "noopener noreferrer",
-        ariaLabel: "Check Jarvis Bot service status"
-      },
-      {
-        text: "Donate",
-        href: "https://buymeacoffee.com/bencos18",
-        target: "_self",
-        ariaLabel: "Support Jarvis Bot development"
-      },
-      {
-        text: "E-Number Lookup",
-        href: "https://enumbers.jarvisdiscordbot.net/",
-        target: "_blank",
-        rel: "noopener noreferrer",
-        ariaLabel: "Lookup E-Numbers for food additives"
-      }
+      { text: "Invite Bot", href: "https://discord.com/oauth2/authorize?client_id=603939742316363778&scope=bot&permissions=1095216004855", target: "_blank", rel: "noopener noreferrer", ariaLabel: "Invite Jarvis Bot to your Discord server" },
+      { text: "Dashboard", href: "https://dash.jarvisdiscordbot.net/", target: "_self", ariaLabel: "Access Jarvis Bot dashboard" },
+      { text: "Support", href: "https://discord.com/invite/WW4eNQj9qr", target: "_blank", rel: "noopener noreferrer", ariaLabel: "Join our Discord support server" },
+      { text: "Commands", href: "https://dash.jarvisdiscordbot.net/commands", target: "_self", ariaLabel: "View all available bot commands" },
+      { text: "Status Page", href: "https://status.jarvisdiscordbot.net/", target: "_blank", rel: "noopener noreferrer", ariaLabel: "Check Jarvis Bot service status" },
+      { text: "Donate", href: "https://buymeacoffee.com/bencos18", target: "_self", ariaLabel: "Support Jarvis Bot development" },
+      { text: "E-Number Lookup", href: "https://enumbers.jarvisdiscordbot.net/", target: "_blank", rel: "noopener noreferrer", ariaLabel: "Lookup E-Numbers for food additives" }
     ];
 
     const container = document.getElementById('btnContainer');
-    buttons.forEach((btn, index) => {
-      const a = document.createElement('a');
-      a.className = 'btn';
-      a.textContent = btn.text;
-      a.href = btn.href;
-      if (btn.target) a.target = btn.target;
-      if (btn.rel) a.rel = btn.rel;
-      if (btn.ariaLabel) a.setAttribute('aria-label', btn.ariaLabel);
-
-      // Add staggered animation
-      a.style.animationDelay = `${index * 0.1}s`;
-      a.style.animation = 'fadeInUp 0.6s ease-out both';
-
-      container.appendChild(a);
-    });
-
-    // Create floating particles
-    function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      const particleCount = 20;
-
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 15 + 's';
-        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        particlesContainer.appendChild(particle);
-      }
-    }
-
-    window.addEventListener('load', () => {
-      const footer = document.querySelector('footer');
-      const contentWrapper = document.getElementById('contentWrapper');
-      if (footer && contentWrapper) {
-        const footerStyle = getComputedStyle(footer);
-        const footerHeight =
-          footer.offsetHeight +
-          parseInt(footerStyle.marginTop) +
-          parseInt(footerStyle.marginBottom);
-        contentWrapper.style.paddingBottom = footerHeight + 20 + 'px';
-      }
-
-      // Initialize particles
-      createParticles();
-
-      // Mobile navigation toggle
-      const navToggle = document.getElementById('navToggle');
-      const navLinks = document.querySelector('.nav-links');
-
-      if (navToggle && navLinks) {
-        navToggle.addEventListener('click', () => {
-          navToggle.classList.toggle('active');
-          navLinks.classList.toggle('active');
-        });
-
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-          link.addEventListener('click', () => {
-            navToggle.classList.remove('active');
-            navLinks.classList.remove('active');
-          });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-          if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-            navToggle.classList.remove('active');
-            navLinks.classList.remove('active');
-          }
-        });
-      }
-    });
-  </script>
-
-<!-- Startup Fame badge -->
-<a
-  href="https://startupfa.me/s/jarvis-bot"
-  target="_blank"
-  class="startupfame-badge"
->
-  <img
-    src="https://startupfa.me/badges/featured-badge-small.webp"
-    alt="Jarvis Bot - Featured on Startup Fame"
-    width="224"
-    height="36"
-  />
-</a>
-</body>
-</html>
+    buttons.forEach((btn,index)=>{
+      const a=document.createElement('a');
+      a.className='btn'; a.textContent=btn.text; a.href=btn.href;
+      if(btn.target)a.target=btn.target;
+      if(btn.rel)a.rel=btn.rel;
+      if(btn.ariaLabel)a.setAttribute('aria-label',btn.ariaLabel);
+      a.style.animationDelay=`${index*0.1}s`; a.style.animation*
