@@ -1,4 +1,4 @@
-name: Deploy Production
+name: Deploy landing.html
 
 on:
   push:
@@ -26,7 +26,12 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
 
-      - name: Deploy jarvislandingpage
+      - name: Deploy landing.html
         run: |
-          rsync -av --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
-            ./jarvislandingpage/ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/
+          # Ensure the target directory exists
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
+            "mkdir -p /var/www/jarvislandingpage"
+
+          # Copy only landing.html
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ./jarvislandingpage/landing.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
