@@ -1,9 +1,9 @@
-name: Deploy Production
+name: Deploy landing.html
 
 on:
   push:
     branches:
-      - production
+      - Production  # match your branch name exactly
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: production
+          ref: Production
 
       - name: Setup SSH
         run: |
@@ -22,8 +22,17 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
-
-      - name: Deploy jarvislandingpage
+      - name: Test SSH connection
         run: |
-          rsync -av --delete -e "ssh -i ~/.ssh/id_ed25519" \
-            ./jarvislandingpage/ deploy@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
+
+      - name: Deploy index.html as landing.html
+        run: |
+          # Ensure the target directory exists on the server
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "mkdir -p /var/www/jarvislandingpage"
+
+          # Copy index.html from repo root to landing.html on the server
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
