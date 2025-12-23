@@ -1,4 +1,4 @@
-name: Deploy landing.html
+name: Push to Production
 
 on:
   push:
