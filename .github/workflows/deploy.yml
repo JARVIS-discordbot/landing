@@ -24,14 +24,15 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
 
       - name: Deploy landing.html
         run: |
           # Ensure the target directory exists
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
-            "mkdir -p /var/www/jarvislandingpage"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "mkdir -p /var/www/jarvislandingpage"
 
-          # Copy only landing.html
+          # Copy only landing.html from repo root
           scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            ./landing/landing.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
+            ./landing.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
