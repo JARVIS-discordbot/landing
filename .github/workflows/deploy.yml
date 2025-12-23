@@ -3,7 +3,7 @@ name: Deploy Production
 on:
   push:
     branches:
-      - Production
+      - Production  # match your branch name exactly
 
 jobs:
   deploy:
@@ -22,8 +22,11 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
-# push to server
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
+
       - name: Deploy jarvislandingpage
         run: |
-          rsync -av --delete -e "ssh -i ~/.ssh/id_ed25519" \
-            ./jarvislandingpage/ deploy@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/
+          rsync -av --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            ./jarvislandingpage/ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/
