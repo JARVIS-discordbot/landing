@@ -20,10 +20,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan 2.56.246.125 >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
         run: |
           rsync -av --delete \
             --exclude='.git' \
-            ./ git@2.56.246.125:/var/www/html/
+            ./ git@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/html/
