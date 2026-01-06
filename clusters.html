@@ -14,6 +14,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
   }
 
   h1 {
@@ -87,7 +88,8 @@
 <script>
 async function loadClusters() {
   try {
-    const res = await fetch('http://2.56.246.125:8080/clusters'); // Replace with your endpoint
+    // Use HTTPS reverse proxy via Apache; no raw IP
+    const res = await fetch('/clusters');
     const data = await res.json();
 
     // Show bot and server uptime
