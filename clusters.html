@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jarvis Bot — Cluster Status</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+    color: #fff;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    color: #a3b3ff;
+    margin-bottom: 30px;
+  }
+
+  #uptime {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .cluster-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .cluster-card {
+    background: rgba(26,26,46,0.95);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease;
+  }
+
+  .cluster-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .cluster-card h3 {
+    margin: 0 0 10px 0;
+    color: #7289da;
+    font-size: 1.4rem;
+  }
+
+  .cluster-card p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+    color: #c9d1f0;
+  }
+
+  footer {
+    margin-top: 60px;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #8892b0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Jarvis Discord Bot</h1>
+<h2>Cluster Status Dashboard</h2>
+<div id="uptime">Loading uptime...</div>
+<div class="cluster-container" id="clusters"></div>
+
+<footer>
+  &copy; 2025 Jarvis Discord Bot
+</footer>
+
+<script>
+async function loadClusters() {
+  try {
+    const res = await fetch('http://2.56.246.125:8080/clusters'); // Replace with your endpoint
+    const data = await res.json();
+
+    // Show bot and server uptime
+    document.getElementById('uptime').innerHTML =
+      `<strong>Bot uptime:</strong> ${data.bot_uptime} | <strong>Server uptime:</strong> ${data.server_uptime}`;
+
+    const container = document.getElementById('clusters');
+    container.innerHTML = '';
+
+    data.clusters.forEach(cluster => {
+      const card = document.createElement('div');
+      card.className = 'cluster-card';
+      card.innerHTML = `
+        <h3>${cluster.name} (Shard ${cluster.shard_id})</h3>
+        <p><strong>Servers:</strong> ${cluster.servers}</p>
+        <p><strong>Users:</strong> ${cluster.users}</p>
+        <p><strong>Latency:</strong> ${cluster.latency_ms} ms</p>
+        <p><strong>CPU:</strong> ${cluster.cpu_percent.toFixed(1)}%</p>
+        <p><strong>RAM:</strong> ${cluster.ram_gib.toFixed(2)} GiB</p>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    document.getElementById('clusters').innerHTML = '<p>Failed to fetch cluster data.</p>';
+    console.error(err);
+  }
+}
+
+// Initial load and refresh every 10 seconds
+loadClusters();
+setInterval(loadClusters, 10000);
+</script>
+
+</body>
+</html>
