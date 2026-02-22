@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jarvis Bot — Cluster Status</title>
@@ -19,22 +18,35 @@
     min-height: 100vh;
   }
 
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
+  h1 { font-size: 3rem; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+  h2 { font-size: 1.2rem; color: #a3b3ff; margin-bottom: 30px; }
+
+  /* New System Stats Bar */
+  .system-stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 40px;
+  }
+
+  .stat-box {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px 25px;
+    border: 1px solid rgba(114, 137, 218, 0.3);
+    min-width: 200px;
     text-align: center;
   }
 
-  h2 {
-    font-size: 1.2rem;
-    color: #a3b3ff;
-    margin-bottom: 30px;
-  }
+  .stat-label { color: #8892b0; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; }
+  .stat-value { font-size: 1.4rem; font-weight: bold; color: #7289da; }
 
-  #uptime {
-    text-align: center;
-    margin-bottom: 30px;
-  }
+  /* RAM Progress Bar */
+  .progress-wrapper { width: 100%; background: #23272a; border-radius: 5px; margin-top: 10px; height: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #43b581; width: 0%; transition: width 0.5s ease, background 0.5s ease; }
 
   .cluster-container {
     display: grid;
@@ -49,73 +61,95 @@
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border-left: 5px solid #7289da;
     transition: transform 0.3s ease;
   }
+  .cluster-card.offline { border-left-color: #f04747; opacity: 0.8; }
+  .cluster-card:hover { transform: translateY(-5px); }
 
-  .cluster-card:hover {
-    transform: translateY(-5px);
+  .status-badge {
+    float: right;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: #43b581;
+    color: white;
+    text-transform: uppercase;
   }
+  .status-badge.offline { background: #f04747; }
 
-  .cluster-card h3 {
-    margin: 0 0 10px 0;
-    color: #7289da;
-    font-size: 1.4rem;
-  }
-
-  .cluster-card p {
-    margin: 4px 0;
-    font-size: 0.95rem;
-    color: #c9d1f0;
-  }
-
-  footer {
-    margin-top: 60px;
-    font-size: 0.9rem;
-    text-align: center;
-    color: #8892b0;
-  }
+  footer { margin-top: 60px; font-size: 0.9rem; color: #8892b0; }
 </style>
 </head>
 <body>
 
 <h1>Jarvis Discord Bot</h1>
 <h2>Cluster Status Dashboard</h2>
-<div id="uptime">Loading uptime...</div>
+
+<div class="system-stats-container">
+    <div class="stat-box">
+        <div class="stat-label">Bot RAM Usage</div>
+        <div class="stat-value" id="bot-ram-val">0.00 / 10 GB</div>
+        <div class="progress-wrapper"><div id="ram-bar" class="progress-fill"></div></div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">Total System CPU</div>
+        <div class="stat-value" id="sys-cpu-val">0.0%</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">Bot Uptime</div>
+        <div class="stat-value" id="bot-uptime" style="font-size: 1rem; color: #fff;">Loading...</div>
+    </div>
+</div>
+
 <div class="cluster-container" id="clusters"></div>
 
 <footer>
-  &copy; 2025 Jarvis Discord Bot
+    &copy; 2026 Jarvis Discord Bot | System Status Nominal
 </footer>
 
 <script>
 async function loadClusters() {
   try {
-    // Use HTTPS reverse proxy via Apache; no raw IP
     const res = await fetch('/clusters');
     const data = await res.json();
 
-    // Show bot and server uptime
-    document.getElementById('uptime').innerHTML =
-      `<strong>Bot uptime:</strong> ${data.bot_uptime} | <strong>Server uptime:</strong> ${data.server_uptime}`;
+    // 1. Update Global System Stats
+    const sys = data.system_stats;
+    document.getElementById('sys-cpu-val').innerText = `${sys.cpu_total_percent.toFixed(1)}%`;
+    document.getElementById('bot-ram-val').innerText = `${sys.bot_ram_gb.toFixed(2)} / ${sys.bot_ram_limit_gb} GB`;
+    document.getElementById('bot-uptime').innerText = data.bot_uptime;
 
+    // Update RAM Progress Bar
+    const ramPercent = (sys.bot_ram_gb / sys.bot_ram_limit_gb) * 100;
+    const ramBar = document.getElementById('ram-bar');
+    ramBar.style.width = `${Math.min(ramPercent, 100)}%`;
+    
+    // Color logic for RAM bar
+    if (ramPercent > 85) ramBar.style.background = '#f04747'; // Red
+    else if (ramPercent > 60) ramBar.style.background = '#faa61a'; // Orange
+    else ramBar.style.background = '#43b581'; // Green
+
+    // 2. Update Clusters
     const container = document.getElementById('clusters');
     container.innerHTML = '';
 
     data.clusters.forEach(cluster => {
+      const isOnline = cluster.status === "Online";
       const card = document.createElement('div');
-      card.className = 'cluster-card';
+      card.className = `cluster-card ${isOnline ? '' : 'offline'}`;
+      
       card.innerHTML = `
-        <h3>${cluster.name} (Shard ${cluster.shard_id})</h3>
-        <p><strong>Servers:</strong> ${cluster.servers}</p>
-        <p><strong>Users:</strong> ${cluster.users}</p>
+        <span class="status-badge ${isOnline ? '' : 'offline'}">${cluster.status}</span>
+        <h3>${cluster.name} <small style="color:#8892b0; font-size:0.8rem;">(Shard ${cluster.shard_id})</small></h3>
+        <p><strong>Servers:</strong> ${cluster.servers.toLocaleString()}</p>
+        <p><strong>Users:</strong> ${cluster.users.toLocaleString()}</p>
         <p><strong>Latency:</strong> ${cluster.latency_ms} ms</p>
-        <p><strong>CPU:</strong> ${cluster.cpu_percent.toFixed(1)}%</p>
-        <p><strong>RAM:</strong> ${cluster.ram_gib.toFixed(2)} GiB</p>
       `;
       container.appendChild(card);
     });
   } catch (err) {
-    document.getElementById('clusters').innerHTML = '<p>Failed to fetch cluster data.</p>';
+    document.getElementById('clusters').innerHTML = '<p style="color:#f04747;">Unable to connect to Jarvis API. Retrying...</p>';
     console.error(err);
   }
 }
@@ -127,5 +161,3 @@ setInterval(loadClusters, 10000);
 
 </body>
 </html>
-
-
