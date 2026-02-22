@@ -5,78 +5,59 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jarvis Bot - Cluster Status</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
     color: #fff;
-    margin: 0;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    margin: 0; padding: 40px 20px;
+    display: flex; flex-direction: column; align-items: center; min-height: 100vh;
   }
 
   h1 { font-size: 3rem; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
   h2 { font-size: 1.2rem; color: #a3b3ff; margin-bottom: 30px; }
 
-  /* New System Stats Bar */
   .system-stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    max-width: 1200px;
-    margin-bottom: 40px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
+    width: 100%; max-width: 1200px; margin-bottom: 40px;
   }
 
   .stat-box {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px 25px;
-    border: 1px solid rgba(114, 137, 218, 0.3);
-    min-width: 200px;
-    text-align: center;
+    background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px 25px;
+    border: 1px solid rgba(114, 137, 218, 0.3); min-width: 200px; text-align: center;
   }
 
   .stat-label { color: #8892b0; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; }
   .stat-value { font-size: 1.4rem; font-weight: bold; color: #7289da; }
 
-  /* RAM Progress Bar */
-  .progress-wrapper { width: 100%; background: #23272a; border-radius: 5px; margin-top: 10px; height: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #43b581; width: 0%; transition: width 0.5s ease, background 0.5s ease; }
+  /* Gauge Section */
+  .gauge-section {
+    display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;
+    width: 100%; max-width: 1200px; margin-bottom: 40px;
+  }
+  .gauge-box {
+    background: rgba(26,26,46,0.95); border-radius: 12px; padding: 20px;
+    border: 1px solid rgba(114, 137, 218, 0.2); width: 260px; text-align: center;
+    position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+  .gauge-value-display {
+    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+    font-size: 1.5rem; font-weight: bold;
+  }
 
   .cluster-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap: 20px;
-    width: 100%;
-    max-width: 1200px;
+    display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 20px; width: 100%; max-width: 1200px;
   }
-
   .cluster-card {
-    background: rgba(26,26,46,0.95);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    border-left: 5px solid #7289da;
-    transition: transform 0.3s ease;
+    background: rgba(26,26,46,0.95); border-radius: 12px; padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); border-left: 5px solid #7289da;
   }
-  .cluster-card.offline { border-left-color: #f04747; opacity: 0.8; }
-  .cluster-card:hover { transform: translateY(-5px); }
 
-  .status-badge {
-    float: right;
-    font-size: 0.7rem;
-    padding: 3px 8px;
-    border-radius: 10px;
-    background: #43b581;
-    color: white;
-    text-transform: uppercase;
-  }
-  .status-badge.offline { background: #f04747; }
+  /* Progress Bar Styling */
+  .progress-wrapper { width: 100%; background: #23272a; border-radius: 5px; margin-top: 10px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #7289da; width: 0%; transition: width 0.5s ease; }
 
   footer { margin-top: 60px; font-size: 0.9rem; color: #8892b0; }
 </style>
@@ -84,24 +65,29 @@
 <body>
 
 <h1>Jarvis Discord Bot</h1>
-<h2>Cluster Status Dashboard</h2>
+<h2 id="sync-status">Core Interface Status: Nominal</h2>
 
 <div class="system-stats-container">
     <div class="stat-box">
         <div class="stat-label">Bot RAM Usage</div>
         <div class="stat-value" id="bot-ram-val">0.00 / 10 GB</div>
-        <div class="progress-wrapper"><div id="ram-bar" class="progress-fill"></div></div>
     </div>
     <div class="stat-box">
         <div class="stat-label">Total System CPU</div>
-        <div class="stat-value" id="sys-cpu-val">0.0%</div>
+        <div class="stat-value" id="cpu-load-val">--%</div>
+        <div class="progress-wrapper"><div id="cpu-bar" class="progress-fill"></div></div>
     </div>
     <div class="stat-box">
-        <div class="stat-label">Bot Uptime</div>
-        <div class="stat-value" id="bot-uptime" style="font-size: 1rem; color: #fff;">Loading...</div>
+        <div class="stat-label">Total Servers</div>
+        <div class="stat-value" id="total-servers">--</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">Last Data Sync</div>
+        <div class="stat-value" id="sync-time" style="color: #fff; font-size: 1rem;">--:--:--</div>
     </div>
 </div>
 
+<div class="gauge-section" id="gauge-area"></div>
 <div class="cluster-container" id="clusters"></div>
 
 <footer>
@@ -109,55 +95,97 @@
 </footer>
 
 <script>
+let gauges = {};
+
+const gaugeNeedle = {
+  id: 'gaugeNeedle',
+  afterDatasetsDraw(chart) {
+    const { ctx, data, chartArea: { width, height } } = chart;
+    ctx.save();
+    const angle = Math.PI + (Math.PI * (data.datasets[0].data[0] / 300));
+    ctx.translate(width / 2, chart._metasets[0].data[0].y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, -2); ctx.lineTo(height / 1.5, 0); ctx.lineTo(0, 2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.restore();
+  }
+};
+
+function createGauge(id, name, color) {
+    const container = document.getElementById('gauge-area');
+    const box = document.createElement('div');
+    box.className = 'gauge-box';
+    box.innerHTML = `<div class="stat-label">${name} Latency</div><canvas id="gauge-${id}"></canvas>
+                     <div class="gauge-value-display" id="val-${id}" style="color:${color}">0ms</div>`;
+    container.appendChild(box);
+
+    const ctx = document.getElementById(`gauge-${id}`).getContext('2d');
+    gauges[id] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [0, 300], backgroundColor: [color, 'rgba(255,255,255,0.05)'],
+                borderWidth: 0, circumference: 180, rotation: 270,
+            }]
+        },
+        options: { cutout: '80%', plugins: { legend: { display: false } } },
+        plugins: [gaugeNeedle]
+    });
+}
+
 async function loadClusters() {
   try {
     const res = await fetch('/clusters');
     const data = await res.json();
-
-    // 1. Update Global System Stats
     const sys = data.system_stats;
-    document.getElementById('sys-cpu-val').innerText = `${sys.cpu_total_percent.toFixed(1)}%`;
-    document.getElementById('bot-ram-val').innerText = `${sys.bot_ram_gb.toFixed(2)} / ${sys.bot_ram_limit_gb} GB`;
-    document.getElementById('bot-uptime').innerText = data.bot_uptime;
 
-    // Update RAM Progress Bar
-    const ramPercent = (sys.bot_ram_gb / sys.bot_ram_limit_gb) * 100;
-    const ramBar = document.getElementById('ram-bar');
-    ramBar.style.width = `${Math.min(ramPercent, 100)}%`;
-    
-    // Color logic for RAM bar
-    if (ramPercent > 85) ramBar.style.background = '#f04747'; // Red
-    else if (ramPercent > 60) ramBar.style.background = '#faa61a'; // Orange
-    else ramBar.style.background = '#43b581'; // Green
+    // Update Top Stats
+    document.getElementById('bot-ram-val').innerText = `${sys.bot_ram_gb.toFixed(2)} / 10 GB`;
+    document.getElementById('cpu-load-val').innerText = `${sys.cpu_total_percent}%`;
+    document.getElementById('cpu-bar').style.width = `${sys.cpu_total_percent}%`;
+    document.getElementById('sync-time').innerText = new Date().toLocaleTimeString();
 
-    // 2. Update Clusters
+    let globalServers = 0;
     const container = document.getElementById('clusters');
     container.innerHTML = '';
 
     data.clusters.forEach(cluster => {
-      const isOnline = cluster.status === "Online";
-      const card = document.createElement('div');
-      card.className = `cluster-card ${isOnline ? '' : 'offline'}`;
+      globalServers += cluster.servers;
       
+      if (!gauges[cluster.shard_id]) {
+          const color = cluster.shard_id === 0 ? '#7289da' : '#faa61a';
+          createGauge(cluster.shard_id, cluster.name, color);
+      }
+      
+      const gauge = gauges[cluster.shard_id];
+      gauge.data.datasets[0].data = [Math.min(cluster.latency_ms, 300), Math.max(0, 300 - cluster.latency_ms)];
+      gauge.update();
+      document.getElementById(`val-${cluster.shard_id}`).innerText = `${cluster.latency_ms}ms`;
+
+      // Density calculation: Users per Server
+      const density = (cluster.users / cluster.servers).toFixed(0);
+
+      const card = document.createElement('div');
+      card.className = `cluster-card`;
+      card.style.borderLeftColor = cluster.shard_id === 0 ? '#7289da' : '#faa61a';
       card.innerHTML = `
-        <span class="status-badge ${isOnline ? '' : 'offline'}">${cluster.status}</span>
-        <h3>${cluster.name} <small style="color:#8892b0; font-size:0.8rem;">(Shard ${cluster.shard_id})</small></h3>
+        <h3 style="margin:0;">${cluster.name}</h3>
+        <p style="font-size:0.8rem; color:#8892b0; margin: 5px 0;">Shard ${cluster.shard_id}</p>
         <p><strong>Servers:</strong> ${cluster.servers.toLocaleString()}</p>
         <p><strong>Users:</strong> ${cluster.users.toLocaleString()}</p>
-        <p><strong>Latency:</strong> ${cluster.latency_ms} ms</p>
+        <p><strong>Density:</strong> ${density} Users/Serv</p>
       `;
       container.appendChild(card);
     });
-  } catch (err) {
-    document.getElementById('clusters').innerHTML = '<p style="color:#f04747;">Unable to connect to Jarvis API. Retrying...</p>';
-    console.error(err);
-  }
+
+    document.getElementById('total-servers').innerText = globalServers.toLocaleString();
+
+  } catch (err) { console.error("Sync Offline"); }
 }
 
-// Initial load and refresh every 10 seconds
 loadClusters();
 setInterval(loadClusters, 10000);
 </script>
-
 </body>
 </html>
