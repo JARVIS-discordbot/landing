@@ -174,7 +174,7 @@ async function loadClusters() {
         <p style="font-size:0.8rem; color:#8892b0; margin: 5px 0;">Shard ${cluster.shard_id}</p>
         <p><strong>Servers:</strong> ${cluster.servers.toLocaleString()}</p>
         <p><strong>Users:</strong> ${cluster.users.toLocaleString()}</p>
-        <p><strong>Density:</strong> ${density} Users/Serv</p>
+        <p><strong>Density:</strong> ${density} Users/Server (average)</p>
       `;
       container.appendChild(card);
     });
@@ -189,3 +189,4 @@ setInterval(loadClusters, 10000);
 </script>
 </body>
 </html>
+
