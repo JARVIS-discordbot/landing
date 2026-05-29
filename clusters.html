@@ -153,6 +153,65 @@
       font-size: 0.95rem;
     }
 
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .tab-button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-button:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-button[aria-selected="true"] {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(122, 162, 255, 0.24), rgba(79, 209, 197, 0.18));
+      box-shadow: inset 0 0 0 1px rgba(139, 168, 255, 0.24);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.is-active {
+      display: block;
+      animation: fadeUp 0.22s ease;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -440,56 +499,71 @@
       <div class="status-text" id="sync-detail">Last refresh: --</div>
     </div>
 
-    <div class="stat-grid" id="top-stats">
-      <div class="stat-box">
-        <div class="stat-label">Bot Uptime</div>
-        <div class="stat-value" id="bot-uptime">--</div>
-        <div class="stat-subvalue">Reported by the service</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Server Uptime</div>
-        <div class="stat-value" id="server-uptime">--</div>
-        <div class="stat-subvalue">Host runtime from the endpoint</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">System Platform</div>
-        <div class="stat-value" id="platform">--</div>
-        <div class="stat-subvalue" id="cpu-summary">CPU: --</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Bot Memory</div>
-        <div class="stat-value" id="bot-ram-val">--</div>
-        <div class="progress-wrapper">
-          <div id="bot-ram-bar" class="progress-fill"></div>
-        </div>
-        <div class="stat-subvalue" id="bot-ram-detail">Process RSS and configured limit</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">System RAM</div>
-        <div class="stat-value" id="ram-val">--</div>
-        <div class="progress-wrapper">
-          <div id="ram-bar" class="progress-fill"></div>
-        </div>
-        <div class="stat-subvalue" id="swap-val">Swap: --</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Total Servers</div>
-        <div class="stat-value" id="total-servers">--</div>
-        <div class="stat-subvalue" id="total-users">Total users: --</div>
-      </div>
+    <div class="tabs" role="tablist" aria-label="Cluster dashboard sections">
+      <button class="tab-button" type="button" role="tab" id="tab-overview" aria-controls="panel-overview"
+        aria-selected="true" data-tab="overview">Overview</button>
+      <button class="tab-button" type="button" role="tab" id="tab-latency" aria-controls="panel-latency"
+        aria-selected="false" data-tab="latency">Latency</button>
+      <button class="tab-button" type="button" role="tab" id="tab-clusters" aria-controls="panel-clusters"
+        aria-selected="false" data-tab="clusters">Clusters</button>
     </div>
 
-    <div class="section-title">
-      <h2>Cluster Latency</h2>
-      <span>Each shard is updated from the latest API response.</span>
-    </div>
-    <div class="gauge-section" id="gauge-area"></div>
+    <section class="tab-panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="stat-grid" id="top-stats">
+        <div class="stat-box">
+          <div class="stat-label">Bot Uptime</div>
+          <div class="stat-value" id="bot-uptime">--</div>
+          <div class="stat-subvalue">Reported by the service</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Server Uptime</div>
+          <div class="stat-value" id="server-uptime">--</div>
+          <div class="stat-subvalue">Host runtime from the endpoint</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">System Platform</div>
+          <div class="stat-value" id="platform">--</div>
+          <div class="stat-subvalue" id="cpu-summary">CPU: --</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Bot Memory</div>
+          <div class="stat-value" id="bot-ram-val">--</div>
+          <div class="progress-wrapper">
+            <div id="bot-ram-bar" class="progress-fill"></div>
+          </div>
+          <div class="stat-subvalue" id="bot-ram-detail">Process RSS and configured limit</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">System RAM</div>
+          <div class="stat-value" id="ram-val">--</div>
+          <div class="progress-wrapper">
+            <div id="ram-bar" class="progress-fill"></div>
+          </div>
+          <div class="stat-subvalue" id="swap-val">Swap: --</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Servers</div>
+          <div class="stat-value" id="total-servers">--</div>
+          <div class="stat-subvalue" id="total-users">Total users: --</div>
+        </div>
+      </div>
+    </section>
 
-    <div class="section-title">
-      <h2>Clusters</h2>
-      <span id="cluster-count">0 clusters</span>
-    </div>
-    <div class="cluster-container" id="clusters"></div>
+    <section class="tab-panel" id="panel-latency" role="tabpanel" aria-labelledby="tab-latency" hidden>
+      <div class="section-title">
+        <h2>Cluster Latency</h2>
+        <span>Each shard is updated from the latest API response.</span>
+      </div>
+      <div class="gauge-section" id="gauge-area"></div>
+    </section>
+
+    <section class="tab-panel" id="panel-clusters" role="tabpanel" aria-labelledby="tab-clusters" hidden>
+      <div class="section-title">
+        <h2>Clusters</h2>
+        <span id="cluster-count">0 clusters</span>
+      </div>
+      <div class="cluster-container" id="clusters"></div>
+    </section>
 
     <footer>&copy; 2026 Jarvis Discord Bot | Live cluster telemetry</footer>
   </div>
@@ -577,6 +651,26 @@
       document.getElementById(elementId).style.width = `${percent}%`;
       return percent;
     }
+
+    function setActiveTab(tabName) {
+      const tabs = document.querySelectorAll('.tab-button');
+      const panels = document.querySelectorAll('.tab-panel');
+
+      tabs.forEach(tab => {
+        const isActive = tab.dataset.tab === tabName;
+        tab.setAttribute('aria-selected', String(isActive));
+      });
+
+      panels.forEach(panel => {
+        const isActive = panel.id === `panel-${tabName}`;
+        panel.classList.toggle('is-active', isActive);
+        panel.hidden = !isActive;
+      });
+    }
+
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+    });
 
     async function loadClusters() {
       const syncStatus = document.getElementById('sync-status');
@@ -682,6 +776,10 @@
         document.getElementById('cluster-count').innerText = `${clusterList.length} cluster${clusterList.length === 1 ? '' : 's'}`;
         syncStatus.innerText = 'Telemetry live';
         syncDetail.innerText = `Last refresh: ${new Date().toLocaleTimeString()}`;
+
+        if (clusterList.length > 0) {
+          setActiveTab('overview');
+        }
       } catch (err) {
         console.error('Failed to load cluster telemetry', err);
         syncStatus.innerText = 'Telemetry unavailable';
