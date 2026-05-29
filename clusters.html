@@ -590,7 +590,7 @@
         <div class="stat-box">
           <div class="stat-label">API Version</div>
           <div class="stat-value" id="api-version">--</div>
-          <div class="stat-subvalue">Payload version for this endpoint</div>
+          <div class="stat-subvalue" id="api-version-note">Payload version for this endpoint</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Server Uptime</div>
@@ -657,6 +657,8 @@
   <script>
     const gauges = {};
     const latencyCapMs = 300;
+    const tabStorageKey = 'clusterDashboard.activeTab';
+    const validTabs = ['overview', 'system', 'latency', 'clusters'];
 
     const gaugeNeedle = {
       id: 'gaugeNeedle',
@@ -788,9 +790,10 @@
       const container = document.getElementById('system-details');
       container.innerHTML = '';
       const coreInfo = getCoreSummaryInfo(systemStats);
+      const apiVersion = data.version ?? data.api_version ?? data.payload_version ?? null;
 
       const topRows = [];
-      addDetailRow(topRows, 'API Version', data.version);
+      addDetailRow(topRows, 'API Version', apiVersion ?? 'Not reported');
       addDetailRow(topRows, 'Bot Uptime', data.bot_uptime);
       addDetailRow(topRows, 'Server Uptime', data.server_uptime);
       addDetailRow(topRows, 'Clusters Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
@@ -893,20 +896,38 @@
     }
 
     function setActiveTab(tabName) {
+      const resolvedTab = validTabs.includes(tabName) ? tabName : 'overview';
       const tabs = document.querySelectorAll('.tab-button');
       const panels = document.querySelectorAll('.tab-panel');
 
       tabs.forEach(tab => {
-        const isActive = tab.dataset.tab === tabName;
+        const isActive = tab.dataset.tab === resolvedTab;
         tab.setAttribute('aria-selected', String(isActive));
       });
 
       panels.forEach(panel => {
-        const isActive = panel.id === `panel-${tabName}`;
+        const isActive = panel.id === `panel-${resolvedTab}`;
         panel.classList.toggle('is-active', isActive);
         panel.hidden = !isActive;
       });
+
+      try {
+        localStorage.setItem(tabStorageKey, resolvedTab);
+      } catch (error) {
+        // Ignore storage failures in private or restricted browsing modes.
+      }
     }
+
+    function getStoredTab() {
+      try {
+        const storedTab = localStorage.getItem(tabStorageKey);
+        return validTabs.includes(storedTab) ? storedTab : 'overview';
+      } catch (error) {
+        return 'overview';
+      }
+    }
+
+    setActiveTab(getStoredTab());
 
     document.querySelectorAll('.tab-button').forEach(button => {
       button.addEventListener('click', () => setActiveTab(button.dataset.tab));
@@ -931,8 +952,10 @@
         const swapTotal = Number(sys.swap_total_gb ?? 0);
         const botRam = Number(sys.bot_ram_gb ?? sys.process_rss_gb ?? 0);
         const botLimit = Number(sys.bot_ram_limit_gb ?? 0);
+        const apiVersion = data.version ?? data.api_version ?? data.payload_version ?? null;
 
-        document.getElementById('api-version').innerText = data.version || 'Unknown';
+        document.getElementById('api-version').innerText = apiVersion || 'Not reported';
+        document.getElementById('api-version-note').innerText = apiVersion ? 'Payload version for this endpoint' : 'Version field not present in payload';
         document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
         document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
         document.getElementById('platform').innerText = sys.platform || 'Linux x86_64';
