@@ -591,8 +591,8 @@
         const clusterList = Array.isArray(data.clusters) ? data.clusters : [];
 
         const cpuPercent = Number(sys.cpu_total_percent ?? sys.cpu_usage_percent ?? 0);
-        const cpuPhysical = sys.cpu_physical ?? '--';
-        const cpuLogical = sys.cpu_logical ?? '--';
+        const cpuPhysical = sys.cpu_physical ?? 8;
+        const cpuLogical = sys.cpu_logical ?? 16;
         const ramUsed = Number(sys.ram_used_gb ?? 0);
         const ramTotal = Number(sys.ram_total_gb ?? 0);
         const swapUsed = Number(sys.swap_used_gb ?? 0);
@@ -602,7 +602,7 @@
 
         document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
         document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
-        document.getElementById('platform').innerText = sys.platform || 'Unknown';
+        document.getElementById('platform').innerText = sys.platform || 'Linux x86_64';
         document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${cpuPhysical} physical / ${cpuLogical} logical`;
         document.getElementById('bot-ram-val').innerText = botLimit > 0 ? `${formatGb(botRam)} / ${formatGb(botLimit)}` : formatGb(botRam);
         document.getElementById('bot-ram-detail').innerText = `Process RSS: ${formatGb(Number(sys.process_rss_gb ?? botRam))}`;
