@@ -657,6 +657,8 @@
   <script>
     const gauges = {};
     const latencyCapMs = 300;
+    const tabStorageKey = 'clusterDashboard.activeTab';
+    const validTabs = ['overview', 'system', 'latency', 'clusters'];
 
     const gaugeNeedle = {
       id: 'gaugeNeedle',
@@ -894,20 +896,38 @@
     }
 
     function setActiveTab(tabName) {
+      const resolvedTab = validTabs.includes(tabName) ? tabName : 'overview';
       const tabs = document.querySelectorAll('.tab-button');
       const panels = document.querySelectorAll('.tab-panel');
 
       tabs.forEach(tab => {
-        const isActive = tab.dataset.tab === tabName;
+        const isActive = tab.dataset.tab === resolvedTab;
         tab.setAttribute('aria-selected', String(isActive));
       });
 
       panels.forEach(panel => {
-        const isActive = panel.id === `panel-${tabName}`;
+        const isActive = panel.id === `panel-${resolvedTab}`;
         panel.classList.toggle('is-active', isActive);
         panel.hidden = !isActive;
       });
+
+      try {
+        localStorage.setItem(tabStorageKey, resolvedTab);
+      } catch (error) {
+        // Ignore storage failures in private or restricted browsing modes.
+      }
     }
+
+    function getStoredTab() {
+      try {
+        const storedTab = localStorage.getItem(tabStorageKey);
+        return validTabs.includes(storedTab) ? storedTab : 'overview';
+      } catch (error) {
+        return 'overview';
+      }
+    }
+
+    setActiveTab(getStoredTab());
 
     document.querySelectorAll('.tab-button').forEach(button => {
       button.addEventListener('click', () => setActiveTab(button.dataset.tab));
