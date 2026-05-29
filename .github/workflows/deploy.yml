@@ -3,7 +3,7 @@ name: Push to Production
 on:
   push:
     branches:
-      - Production  # match your branch name exactly
+      - Production
 
 jobs:
   deploy:
@@ -29,10 +29,11 @@ jobs:
 
       - name: Deploy index.html as landing.html
         run: |
-          # Ensure the target directory exists on the server
+          # Ensure the directory exists and set correct group permissions
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "mkdir -p /var/www/jarvislandingpage"
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
+            "sudo mkdir -p /var/www/jarvislandingpage && sudo chown -R ${{ secrets.DEPLOY_USER }}:www-data /var/www/jarvislandingpage && sudo chmod -R 775 /var/www/jarvislandingpage"
 
-          # Copy index.html from repo root to landing.html on the server
-          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+          # Use rsync to upload the file; it is more robust than scp for web directories
+          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
             ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
