@@ -596,6 +596,7 @@
           <div class="stat-label">System Platform</div>
           <div class="stat-value" id="platform">--</div>
           <div class="stat-subvalue" id="cpu-summary">CPU: --</div>
+          <div class="stat-subvalue" id="cpu-source">Core source: --</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Bot Memory</div>
@@ -781,11 +782,15 @@
     function renderSystemDetails(systemStats, data) {
       const container = document.getElementById('system-details');
       container.innerHTML = '';
+      const coreInfo = getCoreSummaryInfo(systemStats);
 
       const topRows = [];
       addDetailRow(topRows, 'Bot Uptime', data.bot_uptime);
       addDetailRow(topRows, 'Server Uptime', data.server_uptime);
       addDetailRow(topRows, 'Clusters Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
+      addDetailRow(topRows, 'Core Summary', coreInfo.summary);
+      addDetailRow(topRows, 'Core Source', coreInfo.source);
+      addDetailRow(topRows, 'Missing Core Fields', coreInfo.missing.length ? coreInfo.missing.join(', ') : 'None');
 
       const hostRows = [];
       addDetailRow(hostRows, 'OS', systemStats.os);
@@ -834,6 +839,10 @@
     }
 
     function formatCoreSummary(systemStats) {
+      return getCoreSummaryInfo(systemStats).summary;
+    }
+
+    function getCoreSummaryInfo(systemStats) {
       const toPositiveNumber = value => {
         const numberValue = Number(value);
         return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : null;
@@ -847,22 +856,34 @@
         : toPositiveNumber(systemStats.cpu_affinity);
 
       if (physical !== null && logical !== null) {
-        return `${physical} physical / ${logical} logical`;
+        return {
+          summary: `${physical} physical / ${logical} logical`,
+          source: 'cpu_physical and cpu_logical',
+          missing: [],
+        };
       }
 
       if (cpuCount !== null) {
-        return `${cpuCount} cores total`;
+        return {
+          summary: `${cpuCount} cores total`,
+          source: 'cpu_count',
+          missing: ['cpu_physical', 'cpu_logical'],
+        };
       }
 
       if (affinity !== null) {
-        return `${affinity} cores available`;
+        return {
+          summary: `${affinity} cores available`,
+          source: 'cpu_affinity',
+          missing: ['cpu_physical', 'cpu_logical', 'cpu_count'],
+        };
       }
 
-      if (physical !== null || logical !== null) {
-        return `${physical ?? logical} cores reported`;
-      }
-
-      return 'No core count reported';
+      return {
+        summary: 'No core count reported',
+        source: 'none',
+        missing: ['cpu_physical', 'cpu_logical', 'cpu_count', 'cpu_affinity'],
+      };
     }
 
     function setActiveTab(tabName) {
@@ -908,7 +929,9 @@
         document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
         document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
         document.getElementById('platform').innerText = sys.platform || 'Linux x86_64';
-        document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${formatCoreSummary(sys)}`;
+        const coreInfo = getCoreSummaryInfo(sys);
+        document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${coreInfo.summary}`;
+        document.getElementById('cpu-source').innerText = `Core source: ${coreInfo.source}${coreInfo.missing.length ? ` | missing: ${coreInfo.missing.join(', ')}` : ''}`;
         document.getElementById('bot-ram-val').innerText = botLimit > 0 ? `${formatGb(botRam)} / ${formatGb(botLimit)}` : formatGb(botRam);
         document.getElementById('bot-ram-detail').innerText = `Process RSS: ${formatGb(Number(sys.process_rss_gb ?? botRam))}`;
         document.getElementById('ram-val').innerText = `${formatGb(ramUsed)} / ${formatGb(ramTotal)}`;
