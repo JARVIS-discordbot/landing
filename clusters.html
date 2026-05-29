@@ -13,7 +13,9 @@
       --bg: #07111f;
       --bg-elevated: rgba(10, 18, 33, 0.82);
       --bg-panel: rgba(12, 22, 42, 0.94);
+      --bg-panel-hover: rgba(18, 32, 58, 0.98);
       --border: rgba(139, 168, 255, 0.22);
+      --border-hover: rgba(139, 168, 255, 0.4);
       --muted: #9fb0d0;
       --text: #eef3ff;
       --accent: #7aa2ff;
@@ -21,6 +23,7 @@
       --warning: #f5b971;
       --danger: #ff7b7b;
       --shadow: 0 22px 55px rgba(0, 0, 0, 0.42);
+      --shadow-hover: 0 28px 68px rgba(0, 0, 0, 0.55);
     }
 
     * {
@@ -30,13 +33,14 @@
     body {
       margin: 0;
       min-height: 100vh;
-      padding: 40px 20px 56px;
+      padding: 48px 20px 64px;
       color: var(--text);
       font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background:
         radial-gradient(circle at top left, rgba(122, 162, 255, 0.25), transparent 32%),
         radial-gradient(circle at top right, rgba(79, 209, 197, 0.18), transparent 28%),
         linear-gradient(145deg, #05101e 0%, #0a1628 45%, #07111f 100%);
+      transition: background 0.3s ease;
     }
 
     body::before {
@@ -59,7 +63,7 @@
     .hero {
       display: grid;
       gap: 14px;
-      margin-bottom: 28px;
+      margin-bottom: 36px;
     }
 
     .eyebrow {
@@ -77,29 +81,34 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2.2rem, 4vw, 4rem);
-      line-height: 1;
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      line-height: 1.1;
       letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #eef3ff, #a3b3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .subtitle {
       margin: 0;
-      max-width: 68ch;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.6;
+      max-width: 72ch;
+      color: #bcc7de;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      font-weight: 400;
     }
 
     .status-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
       align-items: center;
-      margin-bottom: 28px;
-      padding: 16px 18px;
+      margin-bottom: 36px;
+      padding: 18px 22px;
       border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--bg-elevated);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-elevated), rgba(18, 32, 58, 0.6));
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
@@ -108,11 +117,12 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(79, 209, 197, 0.12);
+      background: rgba(79, 209, 197, 0.15);
       color: #aef3eb;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
 
     .status-dot {
@@ -120,7 +130,22 @@
       height: 10px;
       border-radius: 50%;
       background: #48e0c2;
-      box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14);
+      box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14), 0 0 12px rgba(72, 224, 194, 0.35);
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14), 0 0 12px rgba(72, 224, 194, 0.35);
+      }
+
+      50% {
+        opacity: 0.8;
+        box-shadow: 0 0 0 10px rgba(72, 224, 194, 0.08), 0 0 20px rgba(72, 224, 194, 0.25);
+      }
     }
 
     .status-text {
@@ -131,31 +156,41 @@
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 26px;
+      gap: 18px;
+      margin-bottom: 32px;
     }
 
     .stat-box {
-      padding: 18px 18px 16px;
+      padding: 20px;
       border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--bg-panel);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-panel), rgba(18, 32, 58, 0.5));
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-box:hover {
+      border-color: var(--border-hover);
+      background: linear-gradient(135deg, var(--bg-panel-hover), rgba(18, 32, 58, 0.7));
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
     }
 
     .stat-label {
       color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
 
     .stat-value {
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       font-weight: 700;
       letter-spacing: -0.03em;
+      color: #c8d5ff;
     }
 
     .stat-subvalue {
@@ -177,8 +212,9 @@
       height: 100%;
       width: 0%;
       border-radius: inherit;
-      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-      transition: width 0.4s ease;
+      background: linear-gradient(90deg, #6b8dff, #4fd1c5);
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px rgba(122, 162, 255, 0.4);
     }
 
     .section-title {
@@ -186,13 +222,16 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin: 28px 0 14px;
+      margin: 40px 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
 
     .section-title h2 {
       margin: 0;
-      font-size: 1.2rem;
+      font-size: 1.35rem;
       letter-spacing: -0.02em;
+      font-weight: 700;
     }
 
     .section-title span {
@@ -203,17 +242,25 @@
     .gauge-section {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-      margin-bottom: 18px;
+      gap: 20px;
+      margin-bottom: 24px;
     }
 
     .gauge-box {
       position: relative;
-      padding: 20px;
+      padding: 24px;
       border: 1px solid var(--border);
-      border-radius: 20px;
-      background: var(--bg-panel);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-panel), rgba(18, 32, 58, 0.5));
       box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gauge-box:hover {
+      border-color: var(--border-hover);
+      background: linear-gradient(135deg, var(--bg-panel-hover), rgba(18, 32, 58, 0.7));
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
     }
 
     .gauge-value-display {
@@ -227,45 +274,68 @@
 
     .cluster-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
     }
 
     .cluster-card {
-      padding: 18px 18px 16px;
+      padding: 20px;
       border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--bg-panel);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-panel), rgba(18, 32, 58, 0.5));
       box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cluster-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(122, 162, 255, 0.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .cluster-card:hover {
+      border-color: var(--border-hover);
+      background: linear-gradient(135deg, var(--bg-panel-hover), rgba(18, 32, 58, 0.7));
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
     }
 
     .cluster-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .cluster-name {
       margin: 0;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
     }
 
     .cluster-meta {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 0.9rem;
+      margin: 6px 0 0;
+      color: #a3b3c8;
+      font-size: 0.85rem;
     }
 
     .status-badge {
-      padding: 7px 10px;
+      padding: 8px 14px;
       border-radius: 999px;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
       background: rgba(255, 255, 255, 0.07);
+      position: relative;
+      z-index: 1;
     }
 
     .status-online {
@@ -286,28 +356,38 @@
     .cluster-stats {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 18px;
     }
 
     .cluster-stat {
-      padding: 12px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(139, 168, 255, 0.12);
+      position: relative;
+      z-index: 1;
+      transition: all 0.2s ease;
+    }
+
+    .cluster-stat:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(139, 168, 255, 0.2);
     }
 
     .cluster-stat-label {
-      color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
+      color: #9fb0d0;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
     .cluster-stat-value {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 700;
+      color: #c8d5ff;
     }
 
     .empty-state {
@@ -319,9 +399,11 @@
     }
 
     footer {
-      margin-top: 40px;
+      margin-top: 56px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       text-align: center;
     }
 
@@ -348,7 +430,8 @@
       <div class="eyebrow">Jarvis Discord Bot</div>
       <h1>Cluster Status</h1>
       <p class="subtitle">Live service telemetry from the cog endpoint at <strong>/clusters</strong> on port
-        <strong>8080</strong>, including uptime, machine health, and shard-level cluster data.</p>
+        <strong>8080</strong>, including uptime, machine health, and shard-level cluster data.
+      </p>
     </header>
 
     <div class="status-bar">
@@ -525,13 +608,9 @@
         document.getElementById('bot-ram-detail').innerText = `Process RSS: ${formatGb(Number(sys.process_rss_gb ?? botRam))}`;
         document.getElementById('ram-val').innerText = `${formatGb(ramUsed)} / ${formatGb(ramTotal)}`;
         document.getElementById('swap-val').innerText = `Swap: ${formatGb(swapUsed)} / ${formatGb(swapTotal)}`;
-        document.getElementById('total-servers').innerText = '0';
-        document.getElementById('total-users').innerText = 'Total users: 0';
 
         updateMetricBar('bot-ram-bar', botRam, botLimit || Math.max(botRam, 1));
         updateMetricBar('ram-bar', ramUsed, ramTotal || Math.max(ramUsed, 1));
-        document.getElementById('bot-ram-bar').style.width = `${botLimit > 0 ? Math.min((botRam / botLimit) * 100, 100) : 0}%`;
-        document.getElementById('ram-bar').style.width = `${ramTotal > 0 ? Math.min((ramUsed / ramTotal) * 100, 100) : 0}%`;
 
         let globalServers = 0;
         let globalUsers = 0;
