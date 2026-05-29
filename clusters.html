@@ -588,6 +588,11 @@
           <div class="stat-subvalue">Reported by the service</div>
         </div>
         <div class="stat-box">
+          <div class="stat-label">API Version</div>
+          <div class="stat-value" id="api-version">--</div>
+          <div class="stat-subvalue">Payload version for this endpoint</div>
+        </div>
+        <div class="stat-box">
           <div class="stat-label">Server Uptime</div>
           <div class="stat-value" id="server-uptime">--</div>
           <div class="stat-subvalue">Host runtime from the endpoint</div>
@@ -785,6 +790,7 @@
       const coreInfo = getCoreSummaryInfo(systemStats);
 
       const topRows = [];
+      addDetailRow(topRows, 'API Version', data.version);
       addDetailRow(topRows, 'Bot Uptime', data.bot_uptime);
       addDetailRow(topRows, 'Server Uptime', data.server_uptime);
       addDetailRow(topRows, 'Clusters Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
@@ -926,6 +932,7 @@
         const botRam = Number(sys.bot_ram_gb ?? sys.process_rss_gb ?? 0);
         const botLimit = Number(sys.bot_ram_limit_gb ?? 0);
 
+        document.getElementById('api-version').innerText = data.version || 'Unknown';
         document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
         document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
         document.getElementById('platform').innerText = sys.platform || 'Linux x86_64';
