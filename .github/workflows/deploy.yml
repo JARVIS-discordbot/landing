@@ -22,18 +22,23 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Test SSH connection
+      # Step 1: Deploy Landing Page
+      - name: Deploy to Landing Directory
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
-
-      - name: Deploy index.html as landing.html
-        run: |
-          # Ensure the target directory exists
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
             "mkdir -p /var/www/jarvislandingpage"
 
-          # Use rsync to upload the file; this works because 'jarvis' now owns the directory
           rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
             ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
+
+      # Step 2: Deploy Clusters Dashboard
+      # Assuming you have a separate file for the clusters page in your repo
+      - name: Deploy to Clusters Directory
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
+            "mkdir -p /var/www/clusters"
+
+          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            ./clusters.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/clusters/index.html
