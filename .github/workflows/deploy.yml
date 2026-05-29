@@ -29,11 +29,11 @@ jobs:
 
       - name: Deploy index.html as landing.html
         run: |
-          # Ensure the directory exists and set correct group permissions
+          # Ensure the target directory exists
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
-            "sudo mkdir -p /var/www/jarvislandingpage && sudo chown -R ${{ secrets.DEPLOY_USER }}:www-data /var/www/jarvislandingpage && sudo chmod -R 775 /var/www/jarvislandingpage"
+            "mkdir -p /var/www/jarvislandingpage"
 
-          # Use rsync to upload the file; it is more robust than scp for web directories
+          # Use rsync to upload the file; this works because 'jarvis' now owns the directory
           rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
             ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
