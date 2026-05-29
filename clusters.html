@@ -1,192 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Jarvis Bot - Cluster Status</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
-    color: #fff;
-    margin: 0; padding: 40px 20px;
-    display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-  }
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jarvis Bot - Cluster Status</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --bg-elevated: rgba(10, 18, 33, 0.82);
+      --bg-panel: rgba(12, 22, 42, 0.94);
+      --border: rgba(139, 168, 255, 0.22);
+      --muted: #9fb0d0;
+      --text: #eef3ff;
+      --accent: #7aa2ff;
+      --accent-strong: #4fd1c5;
+      --warning: #f5b971;
+      --danger: #ff7b7b;
+      --shadow: 0 22px 55px rgba(0, 0, 0, 0.42);
+    }
 
-  h1 { font-size: 3rem; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
-  h2 { font-size: 1.2rem; color: #a3b3ff; margin-bottom: 30px; }
+    * {
+      box-sizing: border-box;
+    }
 
-  .system-stats-container {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
-    width: 100%; max-width: 1200px; margin-bottom: 40px;
-  }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 40px 20px 56px;
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(122, 162, 255, 0.25), transparent 32%),
+        radial-gradient(circle at top right, rgba(79, 209, 197, 0.18), transparent 28%),
+        linear-gradient(145deg, #05101e 0%, #0a1628 45%, #07111f 100%);
+    }
 
-  .stat-box {
-    background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px 25px;
-    border: 1px solid rgba(114, 137, 218, 0.3); min-width: 200px; text-align: center;
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 90%);
+    }
 
-  .stat-label { color: #8892b0; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; }
-  .stat-value { font-size: 1.4rem; font-weight: bold; color: #7289da; }
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1240px, 100%);
+      margin: 0 auto;
+    }
 
-  /* Gauge Section */
-  .gauge-section {
-    display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;
-    width: 100%; max-width: 1200px; margin-bottom: 40px;
-  }
-  .gauge-box {
-    background: rgba(26,26,46,0.95); border-radius: 12px; padding: 20px;
-    border: 1px solid rgba(114, 137, 218, 0.2); width: 260px; text-align: center;
-    position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-  }
-  .gauge-value-display {
-    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-    font-size: 1.5rem; font-weight: bold;
-  }
+    .hero {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
 
-  .cluster-container {
-    display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap: 20px; width: 100%; max-width: 1200px;
-  }
-  .cluster-card {
-    background: rgba(26,26,46,0.95); border-radius: 12px; padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4); border-left: 5px solid #7289da;
-  }
+    .eyebrow {
+      display: inline-flex;
+      align-self: start;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
 
-  /* Progress Bar Styling */
-  .progress-wrapper { width: 100%; background: #23272a; border-radius: 5px; margin-top: 10px; height: 6px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #7289da; width: 0%; transition: width 0.5s ease; }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
 
-  footer { margin-top: 60px; font-size: 0.9rem; color: #8892b0; }
-</style>
+    .subtitle {
+      margin: 0;
+      max-width: 68ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 28px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(79, 209, 197, 0.12);
+      color: #aef3eb;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #48e0c2;
+      box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14);
+    }
+
+    .status-text {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .stat-box {
+      padding: 18px 18px 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-subvalue {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .progress-wrapper {
+      margin-top: 14px;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+      transition: width 0.4s ease;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 28px 0 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .gauge-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .gauge-box {
+      position: relative;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg-panel);
+      box-shadow: var(--shadow);
+    }
+
+    .gauge-value-display {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .cluster-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .cluster-card {
+      padding: 18px 18px 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-panel);
+      box-shadow: var(--shadow);
+    }
+
+    .cluster-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .cluster-name {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .cluster-meta {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .status-online {
+      color: #aef3eb;
+      background: rgba(72, 224, 194, 0.12);
+    }
+
+    .status-offline {
+      color: #ffc3c3;
+      background: rgba(255, 123, 123, 0.14);
+    }
+
+    .status-degraded {
+      color: #ffe0ac;
+      background: rgba(245, 185, 113, 0.14);
+    }
+
+    .cluster-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .cluster-stat {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cluster-stat-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .cluster-stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      padding: 22px;
+      border: 1px dashed rgba(159, 176, 208, 0.35);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding-top: 24px;
+      }
+
+      .status-bar {
+        align-items: flex-start;
+      }
+
+      .section-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="shell">
+    <header class="hero">
+      <div class="eyebrow">Jarvis Discord Bot</div>
+      <h1>Cluster Status</h1>
+      <p class="subtitle">Live service telemetry from the cog endpoint at <strong>/clusters</strong> on port
+        <strong>8080</strong>, including uptime, machine health, and shard-level cluster data.</p>
+    </header>
 
-<h1>Jarvis Discord Bot</h1>
-<h2 id="sync-status">Core Interface Status: Nominal</h2>
+    <div class="status-bar">
+      <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Awaiting cluster telemetry</span>
+      </div>
+      <div class="status-text" id="sync-detail">Last refresh: --</div>
+    </div>
 
-<div class="system-stats-container">
-    <div class="stat-box">
-        <div class="stat-label">Bot RAM Usage</div>
-        <div class="stat-value" id="bot-ram-val">0.00 / 10 GB</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-label">Total System CPU</div>
-        <div class="stat-value" id="cpu-load-val">--%</div>
-        <div class="progress-wrapper"><div id="cpu-bar" class="progress-fill"></div></div>
-    </div>
-    <div class="stat-box">
+    <div class="stat-grid" id="top-stats">
+      <div class="stat-box">
+        <div class="stat-label">Bot Uptime</div>
+        <div class="stat-value" id="bot-uptime">--</div>
+        <div class="stat-subvalue">Reported by the service</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Server Uptime</div>
+        <div class="stat-value" id="server-uptime">--</div>
+        <div class="stat-subvalue">Host runtime from the endpoint</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">System Platform</div>
+        <div class="stat-value" id="platform">--</div>
+        <div class="stat-subvalue" id="cpu-summary">CPU: --</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Bot Memory</div>
+        <div class="stat-value" id="bot-ram-val">--</div>
+        <div class="progress-wrapper">
+          <div id="bot-ram-bar" class="progress-fill"></div>
+        </div>
+        <div class="stat-subvalue" id="bot-ram-detail">Process RSS and configured limit</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">System RAM</div>
+        <div class="stat-value" id="ram-val">--</div>
+        <div class="progress-wrapper">
+          <div id="ram-bar" class="progress-fill"></div>
+        </div>
+        <div class="stat-subvalue" id="swap-val">Swap: --</div>
+      </div>
+      <div class="stat-box">
         <div class="stat-label">Total Servers</div>
         <div class="stat-value" id="total-servers">--</div>
+        <div class="stat-subvalue" id="total-users">Total users: --</div>
+      </div>
     </div>
-    <div class="stat-box">
-        <div class="stat-label">Last Data Sync</div>
-        <div class="stat-value" id="sync-time" style="color: #fff; font-size: 1rem;">--:--:--</div>
+
+    <div class="section-title">
+      <h2>Cluster Latency</h2>
+      <span>Each shard is updated from the latest API response.</span>
     </div>
-</div>
+    <div class="gauge-section" id="gauge-area"></div>
 
-<div class="gauge-section" id="gauge-area"></div>
-<div class="cluster-container" id="clusters"></div>
+    <div class="section-title">
+      <h2>Clusters</h2>
+      <span id="cluster-count">0 clusters</span>
+    </div>
+    <div class="cluster-container" id="clusters"></div>
 
-<footer>
-    &copy; 2026 Jarvis Discord Bot | System Status Nominal
-</footer>
+    <footer>&copy; 2026 Jarvis Discord Bot | Live cluster telemetry</footer>
+  </div>
 
-<script>
-let gauges = {};
+  <script>
+    const gauges = {};
+    const latencyCapMs = 300;
 
-const gaugeNeedle = {
-  id: 'gaugeNeedle',
-  afterDatasetsDraw(chart) {
-    const { ctx, data, chartArea: { width, height } } = chart;
-    ctx.save();
-    const angle = Math.PI + (Math.PI * (data.datasets[0].data[0] / 300));
-    ctx.translate(width / 2, chart._metasets[0].data[0].y);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.moveTo(0, -2); ctx.lineTo(height / 1.5, 0); ctx.lineTo(0, 2);
-    ctx.fillStyle = '#fff'; ctx.fill();
-    ctx.restore();
-  }
-};
+    const gaugeNeedle = {
+      id: 'gaugeNeedle',
+      afterDatasetsDraw(chart) {
+        const { ctx, data, chartArea: { width, height } } = chart;
+        ctx.save();
+        const angle = Math.PI + (Math.PI * (data.datasets[0].data[0] / latencyCapMs));
+        ctx.translate(width / 2, chart._metasets[0].data[0].y);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.lineTo(height / 1.5, 0);
+        ctx.lineTo(0, 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.restore();
+      }
+    };
 
-function createGauge(id, name, color) {
-    const container = document.getElementById('gauge-area');
-    const box = document.createElement('div');
-    box.className = 'gauge-box';
-    box.innerHTML = `<div class="stat-label">${name} Latency</div><canvas id="gauge-${id}"></canvas>
-                     <div class="gauge-value-display" id="val-${id}" style="color:${color}">0ms</div>`;
-    container.appendChild(box);
+    function formatNumber(value, digits = 0) {
+      return Number(value || 0).toLocaleString(undefined, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      });
+    }
 
-    const ctx = document.getElementById(`gauge-${id}`).getContext('2d');
-    gauges[id] = new Chart(ctx, {
+    function formatGb(value) {
+      return `${formatNumber(value, 2)} GB`;
+    }
+
+    function formatPercent(value) {
+      return `${formatNumber(value, 1)}%`;
+    }
+
+    function getStatusClass(status) {
+      const normalized = String(status || 'Unknown').toLowerCase();
+      if (normalized.includes('online')) return 'status-online';
+      if (normalized.includes('degrad')) return 'status-degraded';
+      if (normalized.includes('offline')) return 'status-offline';
+      return '';
+    }
+
+    function createGauge(id, name, color) {
+      const container = document.getElementById('gauge-area');
+      const box = document.createElement('div');
+      box.className = 'gauge-box';
+      box.innerHTML = `
+    <div class="stat-label">${name} Latency</div>
+    <canvas id="gauge-${id}"></canvas>
+    <div class="gauge-value-display" id="val-${id}" style="color:${color}">-- ms</div>
+  `;
+      container.appendChild(box);
+
+      const ctx = document.getElementById(`gauge-${id}`).getContext('2d');
+      gauges[id] = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            datasets: [{
-                data: [0, 300], backgroundColor: [color, 'rgba(255,255,255,0.05)'],
-                borderWidth: 0, circumference: 180, rotation: 270,
-            }]
+          datasets: [{
+            data: [0, latencyCapMs],
+            backgroundColor: [color, 'rgba(255,255,255,0.07)'],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: 270,
+          }],
         },
-        options: { cutout: '80%', plugins: { legend: { display: false } } },
-        plugins: [gaugeNeedle]
-    });
-}
+        options: {
+          cutout: '80%',
+          plugins: { legend: { display: false } },
+          responsive: true,
+          maintainAspectRatio: true,
+        },
+        plugins: [gaugeNeedle],
+      });
+    }
 
-async function loadClusters() {
-  try {
-    const res = await fetch('/clusters');
-    const data = await res.json();
-    const sys = data.system_stats;
+    function updateMetricBar(elementId, value, limit) {
+      const percent = limit > 0 ? Math.min((value / limit) * 100, 100) : 0;
+      document.getElementById(elementId).style.width = `${percent}%`;
+      return percent;
+    }
 
-    // Update Top Stats
-    document.getElementById('bot-ram-val').innerText = `${sys.bot_ram_gb.toFixed(2)} / 10 GB`;
-    document.getElementById('cpu-load-val').innerText = `${sys.cpu_total_percent}%`;
-    document.getElementById('cpu-bar').style.width = `${sys.cpu_total_percent}%`;
-    document.getElementById('sync-time').innerText = new Date().toLocaleTimeString();
+    async function loadClusters() {
+      const syncStatus = document.getElementById('sync-status');
+      const syncDetail = document.getElementById('sync-detail');
 
-    let globalServers = 0;
-    const container = document.getElementById('clusters');
-    container.innerHTML = '';
+      try {
+        const res = await fetch('/clusters', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-    data.clusters.forEach(cluster => {
-      globalServers += cluster.servers;
-      
-      if (!gauges[cluster.shard_id]) {
-          const color = cluster.shard_id === 0 ? '#7289da' : '#faa61a';
-          createGauge(cluster.shard_id, cluster.name, color);
-      }
-      
-      const gauge = gauges[cluster.shard_id];
-      gauge.data.datasets[0].data = [Math.min(cluster.latency_ms, 300), Math.max(0, 300 - cluster.latency_ms)];
-      gauge.update();
-      document.getElementById(`val-${cluster.shard_id}`).innerText = `${cluster.latency_ms}ms`;
+        const data = await res.json();
+        const sys = data.system_stats || {};
+        const clusterList = Array.isArray(data.clusters) ? data.clusters : [];
 
-      // Density calculation: Users per Server
-      const density = (cluster.users / cluster.servers).toFixed(0);
+        const cpuPercent = Number(sys.cpu_total_percent ?? sys.cpu_usage_percent ?? 0);
+        const cpuPhysical = sys.cpu_physical ?? '--';
+        const cpuLogical = sys.cpu_logical ?? '--';
+        const ramUsed = Number(sys.ram_used_gb ?? 0);
+        const ramTotal = Number(sys.ram_total_gb ?? 0);
+        const swapUsed = Number(sys.swap_used_gb ?? 0);
+        const swapTotal = Number(sys.swap_total_gb ?? 0);
+        const botRam = Number(sys.bot_ram_gb ?? sys.process_rss_gb ?? 0);
+        const botLimit = Number(sys.bot_ram_limit_gb ?? 0);
 
-      const card = document.createElement('div');
-      card.className = `cluster-card`;
-      card.style.borderLeftColor = cluster.shard_id === 0 ? '#7289da' : '#faa61a';
-      card.innerHTML = `
-        <h3 style="margin:0;">${cluster.name}</h3>
-        <p style="font-size:0.8rem; color:#8892b0; margin: 5px 0;">Shard ${cluster.shard_id}</p>
-        <p><strong>Servers:</strong> ${cluster.servers.toLocaleString()}</p>
-        <p><strong>Users:</strong> ${cluster.users.toLocaleString()}</p>
-        <p><strong>Density:</strong> ${density} Users/Server (average)</p>
+        document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
+        document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
+        document.getElementById('platform').innerText = sys.platform || 'Unknown';
+        document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${cpuPhysical} physical / ${cpuLogical} logical`;
+        document.getElementById('bot-ram-val').innerText = botLimit > 0 ? `${formatGb(botRam)} / ${formatGb(botLimit)}` : formatGb(botRam);
+        document.getElementById('bot-ram-detail').innerText = `Process RSS: ${formatGb(Number(sys.process_rss_gb ?? botRam))}`;
+        document.getElementById('ram-val').innerText = `${formatGb(ramUsed)} / ${formatGb(ramTotal)}`;
+        document.getElementById('swap-val').innerText = `Swap: ${formatGb(swapUsed)} / ${formatGb(swapTotal)}`;
+        document.getElementById('total-servers').innerText = '0';
+        document.getElementById('total-users').innerText = 'Total users: 0';
+
+        updateMetricBar('bot-ram-bar', botRam, botLimit || Math.max(botRam, 1));
+        updateMetricBar('ram-bar', ramUsed, ramTotal || Math.max(ramUsed, 1));
+        document.getElementById('bot-ram-bar').style.width = `${botLimit > 0 ? Math.min((botRam / botLimit) * 100, 100) : 0}%`;
+        document.getElementById('ram-bar').style.width = `${ramTotal > 0 ? Math.min((ramUsed / ramTotal) * 100, 100) : 0}%`;
+
+        let globalServers = 0;
+        let globalUsers = 0;
+        const clusterContainer = document.getElementById('clusters');
+        const gaugeArea = document.getElementById('gauge-area');
+        clusterContainer.innerHTML = '';
+        gaugeArea.innerHTML = '';
+
+        if (clusterList.length === 0) {
+          clusterContainer.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
+          document.getElementById('cluster-count').innerText = '0 clusters';
+        }
+
+        clusterList.forEach(cluster => {
+          globalServers += Number(cluster.servers ?? 0);
+          globalUsers += Number(cluster.users ?? 0);
+
+          const shardId = cluster.shard_id ?? 0;
+          const color = shardId === 0 ? '#7aa2ff' : '#f5b971';
+
+          createGauge(shardId, cluster.name || `Shard ${shardId}`, color);
+
+          const latency = Number(cluster.latency_ms ?? 0);
+          const gauge = gauges[shardId];
+          gauge.data.datasets[0].data = [Math.min(latency, latencyCapMs), Math.max(0, latencyCapMs - latency)];
+          gauge.update();
+          document.getElementById(`val-${shardId}`).innerText = `${formatNumber(latency, 0)} ms`;
+
+          const servers = Number(cluster.servers ?? 0);
+          const users = Number(cluster.users ?? 0);
+          const density = servers > 0 ? (users / servers).toFixed(0) : '0';
+          const status = cluster.status || 'Unknown';
+
+          const card = document.createElement('div');
+          card.className = 'cluster-card';
+          card.style.borderLeft = `5px solid ${color}`;
+          card.innerHTML = `
+        <div class="cluster-top">
+          <div>
+            <h3 class="cluster-name">${cluster.name || `Shard ${shardId}`}</h3>
+            <p class="cluster-meta">Shard ${shardId} • ${formatNumber(latency, 0)} ms latency</p>
+          </div>
+          <div class="status-badge ${getStatusClass(status)}">${status}</div>
+        </div>
+        <div class="cluster-stats">
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Servers</div>
+            <div class="cluster-stat-value">${formatNumber(servers)}</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Users</div>
+            <div class="cluster-stat-value">${formatNumber(users)}</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Density</div>
+            <div class="cluster-stat-value">${density} users/server</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Latency</div>
+            <div class="cluster-stat-value">${formatNumber(latency, 0)} ms</div>
+          </div>
+        </div>
       `;
-      container.appendChild(card);
-    });
+          clusterContainer.appendChild(card);
+        });
 
-    document.getElementById('total-servers').innerText = globalServers.toLocaleString();
+        document.getElementById('total-servers').innerText = formatNumber(globalServers);
+        document.getElementById('total-users').innerText = `Total users: ${formatNumber(globalUsers)}`;
+        document.getElementById('cluster-count').innerText = `${clusterList.length} cluster${clusterList.length === 1 ? '' : 's'}`;
+        syncStatus.innerText = 'Telemetry live';
+        syncDetail.innerText = `Last refresh: ${new Date().toLocaleTimeString()}`;
+      } catch (err) {
+        console.error('Failed to load cluster telemetry', err);
+        syncStatus.innerText = 'Telemetry unavailable';
+        syncDetail.innerText = 'Unable to reach /clusters right now';
+      }
+    }
 
-  } catch (err) { console.error("Sync Offline"); }
-}
-
-loadClusters();
-setInterval(loadClusters, 10000);
-</script>
+    loadClusters();
+    setInterval(loadClusters, 10000);
+  </script>
 </body>
-</html>
 
+</html>
