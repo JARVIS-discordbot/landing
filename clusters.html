@@ -200,6 +200,76 @@
       animation: fadeUp 0.22s ease;
     }
 
+    .panel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .detail-card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-panel), rgba(18, 32, 58, 0.5));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .detail-card:hover {
+      border-color: var(--border-hover);
+      background: linear-gradient(135deg, var(--bg-panel-hover), rgba(18, 32, 58, 0.7));
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .detail-card-title {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(139, 168, 255, 0.08);
+    }
+
+    .detail-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .detail-key {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .detail-value {
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .detail-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
     @keyframes fadeUp {
       from {
         opacity: 0;
@@ -502,6 +572,8 @@
     <div class="tabs" role="tablist" aria-label="Cluster dashboard sections">
       <button class="tab-button" type="button" role="tab" id="tab-overview" aria-controls="panel-overview"
         aria-selected="true" data-tab="overview">Overview</button>
+      <button class="tab-button" type="button" role="tab" id="tab-system" aria-controls="panel-system"
+        aria-selected="false" data-tab="system">System</button>
       <button class="tab-button" type="button" role="tab" id="tab-latency" aria-controls="panel-latency"
         aria-selected="false" data-tab="latency">Latency</button>
       <button class="tab-button" type="button" role="tab" id="tab-clusters" aria-controls="panel-clusters"
@@ -547,6 +619,14 @@
           <div class="stat-subvalue" id="total-users">Total users: --</div>
         </div>
       </div>
+    </section>
+
+    <section class="tab-panel" id="panel-system" role="tabpanel" aria-labelledby="tab-system" hidden>
+      <div class="section-title">
+        <h2>System Details</h2>
+        <span>All reported host and process metrics.</span>
+      </div>
+      <div class="panel-grid" id="system-details"></div>
     </section>
 
     <section class="tab-panel" id="panel-latency" role="tabpanel" aria-labelledby="tab-latency" hidden>
@@ -652,6 +732,131 @@
       return percent;
     }
 
+    function formatDetailValue(value) {
+      if (value === undefined || value === null || value === '') {
+        return null;
+      }
+
+      if (Array.isArray(value)) {
+        return value.length ? value.join(', ') : null;
+      }
+
+      if (typeof value === 'number') {
+        return Number.isInteger(value) ? String(value) : formatNumber(value, 2);
+      }
+
+      return String(value);
+    }
+
+    function addDetailRow(rows, label, value, suffix = '') {
+      const formatted = formatDetailValue(value);
+      if (formatted === null) {
+        return;
+      }
+
+      rows.push({
+        label,
+        value: `${formatted}${suffix}`,
+      });
+    }
+
+    function createDetailCard(title, rows, note) {
+      const card = document.createElement('div');
+      card.className = 'detail-card';
+      card.innerHTML = `
+        <h3 class="detail-card-title">${title}</h3>
+        <div class="detail-list">
+          ${rows.map(row => `
+            <div class="detail-row">
+              <div class="detail-key">${row.label}</div>
+              <div class="detail-value">${row.value}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${note ? `<div class="detail-note">${note}</div>` : ''}
+      `;
+      return card;
+    }
+
+    function renderSystemDetails(systemStats, data) {
+      const container = document.getElementById('system-details');
+      container.innerHTML = '';
+
+      const topRows = [];
+      addDetailRow(topRows, 'Bot Uptime', data.bot_uptime);
+      addDetailRow(topRows, 'Server Uptime', data.server_uptime);
+      addDetailRow(topRows, 'Clusters Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
+
+      const hostRows = [];
+      addDetailRow(hostRows, 'OS', systemStats.os);
+      addDetailRow(hostRows, 'OS Release', systemStats.os_release);
+      addDetailRow(hostRows, 'OS Version', systemStats.os_version);
+      addDetailRow(hostRows, 'Platform', systemStats.platform || 'Linux x86_64');
+      addDetailRow(hostRows, 'Machine', systemStats.machine);
+      addDetailRow(hostRows, 'Processor', systemStats.processor);
+      addDetailRow(hostRows, 'Python Version', systemStats.python_version);
+
+      const cpuRows = [];
+      addDetailRow(cpuRows, 'Logical Cores', systemStats.cpu_logical);
+      addDetailRow(cpuRows, 'Physical Cores', systemStats.cpu_physical);
+      addDetailRow(cpuRows, 'CPU Count', systemStats.cpu_count);
+      addDetailRow(cpuRows, 'CPU Affinity', systemStats.cpu_affinity);
+      addDetailRow(cpuRows, 'CPU Usage', systemStats.cpu_usage_percent ?? systemStats.cpu_total_percent, '%');
+      addDetailRow(cpuRows, 'Process CPU', systemStats.process_cpu_percent, '%');
+      addDetailRow(cpuRows, 'Load Average', systemStats.load_average);
+
+      const memoryRows = [];
+      addDetailRow(memoryRows, 'RAM Used', systemStats.ram_used_gb, ' GB');
+      addDetailRow(memoryRows, 'RAM Total', systemStats.ram_total_gb, ' GB');
+      addDetailRow(memoryRows, 'RAM Percent', systemStats.ram_percent, '%');
+      addDetailRow(memoryRows, 'Swap Used', systemStats.swap_used_gb, ' GB');
+      addDetailRow(memoryRows, 'Swap Total', systemStats.swap_total_gb, ' GB');
+      addDetailRow(memoryRows, 'Swap Percent', systemStats.swap_percent, '%');
+
+      const storageRows = [];
+      addDetailRow(storageRows, 'Disk Used', systemStats.disk_used_gb, ' GB');
+      addDetailRow(storageRows, 'Disk Total', systemStats.disk_total_gb, ' GB');
+      addDetailRow(storageRows, 'Disk Percent', systemStats.disk_percent, '%');
+
+      const processRows = [];
+      addDetailRow(processRows, 'Process RSS', systemStats.process_rss_gb, ' GB');
+      addDetailRow(processRows, 'Bot RAM', systemStats.bot_ram_gb, ' GB');
+      addDetailRow(processRows, 'Bot RAM Limit', systemStats.bot_ram_limit_gb, ' GB');
+      addDetailRow(processRows, 'Process Threads', systemStats.process_threads);
+      addDetailRow(processRows, 'Open Files', systemStats.process_open_files);
+
+      container.appendChild(createDetailCard('Top Level', topRows, 'Overall endpoint response values.'));
+      container.appendChild(createDetailCard('Host', hostRows, 'Operating system and platform details.'));
+      container.appendChild(createDetailCard('CPU', cpuRows, 'Core, affinity, and usage metrics.'));
+      container.appendChild(createDetailCard('Memory', memoryRows, 'RAM and swap utilization.'));
+      container.appendChild(createDetailCard('Disk', storageRows, 'Root filesystem statistics when available.'));
+      container.appendChild(createDetailCard('Process', processRows, 'Bot process and runtime information.'));
+    }
+
+    function formatCoreSummary(systemStats) {
+      const physical = systemStats.cpu_physical;
+      const logical = systemStats.cpu_logical;
+      const cpuCount = systemStats.cpu_count;
+      const affinity = Array.isArray(systemStats.cpu_affinity) ? systemStats.cpu_affinity.length : null;
+
+      const resolvedPhysical = physical ?? cpuCount ?? affinity ?? null;
+      const resolvedLogical = logical ?? cpuCount ?? affinity ?? null;
+
+      if (resolvedPhysical !== null && resolvedLogical !== null) {
+        return `${resolvedPhysical} physical / ${resolvedLogical} logical`;
+      }
+
+      if (cpuCount !== undefined && cpuCount !== null) {
+        return `${cpuCount} cores`;
+      }
+
+      if (affinity !== null) {
+        return `${affinity} cores available`;
+      }
+
+      return 'Modern multi-core CPU';
+    }
+
     function setActiveTab(tabName) {
       const tabs = document.querySelectorAll('.tab-button');
       const panels = document.querySelectorAll('.tab-panel');
@@ -685,8 +890,6 @@
         const clusterList = Array.isArray(data.clusters) ? data.clusters : [];
 
         const cpuPercent = Number(sys.cpu_total_percent ?? sys.cpu_usage_percent ?? 0);
-        const cpuPhysical = sys.cpu_physical ?? 8;
-        const cpuLogical = sys.cpu_logical ?? 16;
         const ramUsed = Number(sys.ram_used_gb ?? 0);
         const ramTotal = Number(sys.ram_total_gb ?? 0);
         const swapUsed = Number(sys.swap_used_gb ?? 0);
@@ -697,7 +900,7 @@
         document.getElementById('bot-uptime').innerText = data.bot_uptime || 'Unknown';
         document.getElementById('server-uptime').innerText = data.server_uptime || 'Unknown';
         document.getElementById('platform').innerText = sys.platform || 'Linux x86_64';
-        document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${cpuPhysical} physical / ${cpuLogical} logical`;
+        document.getElementById('cpu-summary').innerText = `CPU: ${formatPercent(cpuPercent)} | ${formatCoreSummary(sys)}`;
         document.getElementById('bot-ram-val').innerText = botLimit > 0 ? `${formatGb(botRam)} / ${formatGb(botLimit)}` : formatGb(botRam);
         document.getElementById('bot-ram-detail').innerText = `Process RSS: ${formatGb(Number(sys.process_rss_gb ?? botRam))}`;
         document.getElementById('ram-val').innerText = `${formatGb(ramUsed)} / ${formatGb(ramTotal)}`;
@@ -705,6 +908,8 @@
 
         updateMetricBar('bot-ram-bar', botRam, botLimit || Math.max(botRam, 1));
         updateMetricBar('ram-bar', ramUsed, ramTotal || Math.max(ramUsed, 1));
+
+        renderSystemDetails(sys, data);
 
         let globalServers = 0;
         let globalUsers = 0;
