@@ -834,27 +834,35 @@
     }
 
     function formatCoreSummary(systemStats) {
-      const physical = systemStats.cpu_physical;
-      const logical = systemStats.cpu_logical;
-      const cpuCount = systemStats.cpu_count;
-      const affinity = Array.isArray(systemStats.cpu_affinity) ? systemStats.cpu_affinity.length : null;
+      const toPositiveNumber = value => {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : null;
+      };
 
-      const resolvedPhysical = physical ?? cpuCount ?? affinity ?? null;
-      const resolvedLogical = logical ?? cpuCount ?? affinity ?? null;
+      const physical = toPositiveNumber(systemStats.cpu_physical);
+      const logical = toPositiveNumber(systemStats.cpu_logical);
+      const cpuCount = toPositiveNumber(systemStats.cpu_count);
+      const affinity = Array.isArray(systemStats.cpu_affinity)
+        ? toPositiveNumber(systemStats.cpu_affinity.length)
+        : toPositiveNumber(systemStats.cpu_affinity);
 
-      if (resolvedPhysical !== null && resolvedLogical !== null) {
-        return `${resolvedPhysical} physical / ${resolvedLogical} logical`;
+      if (physical !== null && logical !== null) {
+        return `${physical} physical / ${logical} logical`;
       }
 
-      if (cpuCount !== undefined && cpuCount !== null) {
-        return `${cpuCount} cores`;
+      if (cpuCount !== null) {
+        return `${cpuCount} cores total`;
       }
 
       if (affinity !== null) {
         return `${affinity} cores available`;
       }
 
-      return 'Modern multi-core CPU';
+      if (physical !== null || logical !== null) {
+        return `${physical ?? logical} cores reported`;
+      }
+
+      return 'No core count reported';
     }
 
     function setActiveTab(tabName) {
@@ -982,9 +990,6 @@
         syncStatus.innerText = 'Telemetry live';
         syncDetail.innerText = `Last refresh: ${new Date().toLocaleTimeString()}`;
 
-        if (clusterList.length > 0) {
-          setActiveTab('overview');
-        }
       } catch (err) {
         console.error('Failed to load cluster telemetry', err);
         syncStatus.innerText = 'Telemetry unavailable';
