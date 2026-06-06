@@ -1,9 +1,9 @@
-name: Deploy landing.html
+name: Push to Production
 
 on:
   push:
     branches:
-      - Production  # match your branch name exactly
+      - Production
 
 jobs:
   deploy:
@@ -22,17 +22,23 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Test SSH connection
+      # Step 1: Deploy Landing Page
+      - name: Deploy to Landing Directory
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "echo SSH connection OK"
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
+            "mkdir -p /var/www/jarvislandingpage"
 
-      - name: Deploy index.html as landing.html
-        run: |
-          # Ensure the target directory exists on the server
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} "mkdir -p /var/www/jarvislandingpage"
-
-          # Copy index.html from repo root to landing.html on the server
-          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
             ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
+
+      # Step 2: Deploy Clusters Dashboard
+      # Assuming you have a separate file for the clusters page in your repo
+      - name: Deploy to Clusters Directory
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }} \
+            "mkdir -p /var/www/clusters"
+
+          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            ./clusters.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/clusters/index.html
