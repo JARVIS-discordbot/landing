@@ -6,10 +6,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta name="author" content="Jarvis Discord Bot Team" />
+  <link rel="canonical" href="https://clusters.jarvisdiscordbot.net/" />
+  <meta property="og:title" content="Jarvis Bot - Cluster Status" />
+  <meta property="og:description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://clusters.jarvisdiscordbot.net/" />
+  <meta property="og:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Jarvis Bot - Cluster Status" />
+  <meta name="twitter:description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta name="twitter:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
   <title>Jarvis Bot - Cluster Status</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
-    integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC"
-    crossorigin="anonymous"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNS0C9K0YJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-DNS0C9K0YJ');
+  </script>
   <style>
     :root {
       color-scheme: dark;
@@ -36,7 +51,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      padding: 32px 16px 48px;
+      padding: 88px 16px 48px;
       color: var(--text);
       font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background:
@@ -122,22 +137,56 @@
       gap: 8px;
       padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(79, 209, 197, 0.15);
-      color: #aef3eb;
+      background: rgba(159, 176, 208, 0.12);
+      color: var(--muted);
       font-weight: 700;
       font-size: 0.9rem;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .status-pill.is-loading {
+      background: rgba(245, 185, 113, 0.15);
+      color: #ffe0ac;
+    }
+
+    .status-pill.is-live {
+      background: rgba(79, 209, 197, 0.15);
+      color: #aef3eb;
+    }
+
+    .status-pill.is-error {
+      background: rgba(255, 123, 123, 0.14);
+      color: #ffc3c3;
     }
 
     .status-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #48e0c2;
-      box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14), 0 0 12px rgba(72, 224, 194, 0.35);
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      background: #9fb0d0;
+      box-shadow: 0 0 0 6px rgba(159, 176, 208, 0.12);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
-    @keyframes pulse {
+    .status-pill.is-loading .status-dot {
+      background: var(--warning);
+      box-shadow: 0 0 0 6px rgba(245, 185, 113, 0.14), 0 0 12px rgba(245, 185, 113, 0.3);
+      animation: pulse-warn 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .status-pill.is-live .status-dot {
+      background: #48e0c2;
+      box-shadow: 0 0 0 6px rgba(72, 224, 194, 0.14), 0 0 12px rgba(72, 224, 194, 0.35);
+      animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .status-pill.is-error .status-dot {
+      background: var(--danger);
+      box-shadow: 0 0 0 6px rgba(255, 123, 123, 0.14);
+      animation: none;
+    }
+
+    @keyframes pulse-live {
 
       0%,
       100% {
@@ -149,6 +198,24 @@
         opacity: 0.8;
         box-shadow: 0 0 0 10px rgba(72, 224, 194, 0.08), 0 0 20px rgba(72, 224, 194, 0.25);
       }
+    }
+
+    @keyframes pulse-warn {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.55;
+      }
+    }
+
+    .shell.is-loading #top-stats {
+      opacity: 0.55;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
     }
 
     .status-text {
@@ -548,9 +615,144 @@
       text-decoration: underline;
     }
 
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(7, 17, 31, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--text);
+      background: rgba(122, 162, 255, 0.12);
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: 0;
+    }
+
+    .nav-toggle span {
+      width: 24px;
+      height: 3px;
+      background: var(--accent);
+      margin: 3px 0;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    .nav-toggle.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .nav-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-toggle.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -5px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: rgba(7, 17, 31, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 16px;
+        gap: 8px;
+        transform: translateY(-120%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-links.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-link {
+        width: 100%;
+        text-align: center;
+        border: 1px solid var(--border);
+      }
+    }
+
     @media (max-width: 640px) {
       body {
-        padding-top: 24px;
+        padding-top: 80px;
       }
 
       .status-bar {
@@ -566,6 +768,26 @@
 </head>
 
 <body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="https://jarvisdiscordbot.net/" class="nav-logo">
+        <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Bot" class="nav-avatar">
+        <span>Jarvis Bot</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="https://jarvisdiscordbot.net/" class="nav-link">Home</a>
+        <a href="https://dash.jarvisdiscordbot.net/" class="nav-link">Dashboard</a>
+        <a href="https://dash.jarvisdiscordbot.net/commands" class="nav-link">Commands</a>
+        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" rel="noopener noreferrer" class="nav-link">Support</a>
+        <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="nav-link">Status</a>
+        <a href="https://clusters.jarvisdiscordbot.net/" class="nav-link is-active" aria-current="page">Cluster Info</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
   <div class="shell">
     <header class="hero">
       <div class="eyebrow">Jarvis Discord Bot</div>
@@ -575,8 +797,8 @@
       </p>
     </header>
 
-    <div class="status-bar">
-      <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Awaiting cluster telemetry</span>
+    <div class="status-bar" aria-live="polite" aria-atomic="true">
+      <div class="status-pill is-loading" id="sync-pill"><span class="status-dot" aria-hidden="true"></span><span id="sync-status">Awaiting cluster telemetry</span>
       </div>
       <div class="status-text" id="sync-detail">Last refresh: --</div>
     </div>
@@ -618,7 +840,7 @@
         <div class="stat-box">
           <div class="stat-label">Bot Memory</div>
           <div class="stat-value" id="bot-ram-val">--</div>
-          <div class="progress-wrapper">
+          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Bot memory usage">
             <div id="bot-ram-bar" class="progress-fill"></div>
           </div>
           <div class="stat-subvalue" id="bot-ram-detail">Process RSS and configured limit</div>
@@ -626,7 +848,7 @@
         <div class="stat-box">
           <div class="stat-label">System RAM</div>
           <div class="stat-value" id="ram-val">--</div>
-          <div class="progress-wrapper">
+          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="System RAM usage">
             <div id="ram-bar" class="progress-fill"></div>
           </div>
           <div class="stat-subvalue" id="swap-val">Swap: --</div>
@@ -668,12 +890,17 @@
   </div>
 
   <script>
-    const gauges = {};
+    const gaugeRegistry = new Map();
     const latencyCapMs = 300;
     const tabStorageKey = 'clusterDashboard.activeTab';
     const validTabs = ['overview', 'system', 'latency', 'clusters'];
+    const CHART_JS_URL = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js';
+    const CHART_JS_INTEGRITY = 'sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC';
     let loadRequestId = 0;
     let refreshIntervalId = null;
+    let chartJsPromise = null;
+    let latestClusterList = [];
+    let gaugesInitialized = false;
 
     const gaugeNeedle = {
       id: 'gaugeNeedle',
@@ -725,13 +952,63 @@
       return '';
     }
 
+    function setSyncState(state, statusText, detailText) {
+      const pill = document.getElementById('sync-pill');
+      pill.classList.remove('is-loading', 'is-live', 'is-error');
+      if (state) {
+        pill.classList.add(`is-${state}`);
+      }
+      document.getElementById('sync-status').innerText = statusText;
+      document.getElementById('sync-detail').innerText = detailText;
+    }
+
+    function ensureChartJs() {
+      if (window.Chart) {
+        return Promise.resolve();
+      }
+      if (chartJsPromise) {
+        return chartJsPromise;
+      }
+
+      chartJsPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = CHART_JS_URL;
+        script.integrity = CHART_JS_INTEGRITY;
+        script.crossOrigin = 'anonymous';
+        script.onload = () => resolve();
+        script.onerror = () => {
+          chartJsPromise = null;
+          reject(new Error('Failed to load Chart.js'));
+        };
+        document.head.appendChild(script);
+      });
+
+      return chartJsPromise;
+    }
+
+    function getClusterKey(cluster, index) {
+      const shardId = cluster.shard_id ?? index;
+      const name = cluster.name || '';
+      return `${shardId}:${name}:${index}`;
+    }
+
+    function getClusterColor(shardId) {
+      return shardId === 0 ? '#7aa2ff' : '#f5b971';
+    }
+
     function destroyGauges() {
-      Object.values(gauges).forEach(chart => chart.destroy());
-      Object.keys(gauges).forEach(key => delete gauges[key]);
+      gaugeRegistry.forEach(entry => {
+        entry.chart.destroy();
+        entry.box.remove();
+      });
+      gaugeRegistry.clear();
+      gaugesInitialized = false;
     }
 
     function clearTelemetryDisplay(message = 'Telemetry unavailable') {
       destroyGauges();
+      latestClusterList = [];
+      document.querySelector('.shell').classList.remove('is-loading');
 
       document.getElementById('api-version').innerText = '--';
       document.getElementById('api-version-note').innerText = 'Payload version for this endpoint';
@@ -757,19 +1034,21 @@
         `<div class="empty-state">${escapeHtml(message)}</div>`;
     }
 
-    function createGauge(id, name, color) {
+    function createGaugeEntry(key, name, color) {
       const container = document.getElementById('gauge-area');
+      const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, '-');
       const box = document.createElement('div');
       box.className = 'gauge-box';
+      box.dataset.gaugeKey = key;
       box.innerHTML = `
     <div class="stat-label">${escapeHtml(name)} Latency</div>
-    <canvas id="gauge-${id}"></canvas>
-    <div class="gauge-value-display" id="val-${id}" style="color:${color}">-- ms</div>
+    <canvas id="gauge-${safeKey}"></canvas>
+    <div class="gauge-value-display" id="val-${safeKey}" style="color:${color}">-- ms</div>
   `;
       container.appendChild(box);
 
-      const ctx = document.getElementById(`gauge-${id}`).getContext('2d');
-      gauges[id] = new Chart(ctx, {
+      const ctx = document.getElementById(`gauge-${safeKey}`).getContext('2d');
+      const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           datasets: [{
@@ -788,11 +1067,95 @@
         },
         plugins: [gaugeNeedle],
       });
+
+      gaugeRegistry.set(key, { chart, box, color, name, safeKey });
+    }
+
+    function updateGaugeEntry(key, latency, name, color) {
+      const entry = gaugeRegistry.get(key);
+      const clamped = Math.min(latency, latencyCapMs);
+      const display = `${formatNumber(latency, 0)} ms`;
+
+      if (!entry) {
+        createGaugeEntry(key, name, color);
+        return updateGaugeEntry(key, latency, name, color);
+      }
+
+      if (entry.name !== name) {
+        entry.box.querySelector('.stat-label').innerText = `${name} Latency`;
+        entry.name = name;
+      }
+
+      entry.color = color;
+      entry.chart.data.datasets[0].backgroundColor = [color, 'rgba(255,255,255,0.07)'];
+      entry.chart.data.datasets[0].data = [clamped, Math.max(0, latencyCapMs - clamped)];
+      entry.chart.update();
+      const valueEl = document.getElementById(`val-${entry.safeKey}`);
+      if (valueEl) {
+        valueEl.style.color = color;
+        valueEl.innerText = display;
+      }
+    }
+
+    async function syncGauges(clusterList) {
+      if (!window.Chart) {
+        return;
+      }
+
+      const nextKeys = new Set();
+
+      clusterList.forEach((cluster, index) => {
+        const key = getClusterKey(cluster, index);
+        nextKeys.add(key);
+        const shardId = cluster.shard_id ?? index;
+        const color = getClusterColor(shardId);
+        const name = cluster.name || `Shard ${shardId}`;
+        const latency = Number(cluster.latency_ms ?? 0);
+        updateGaugeEntry(key, latency, name, color);
+      });
+
+      gaugeRegistry.forEach((entry, key) => {
+        if (!nextKeys.has(key)) {
+          entry.chart.destroy();
+          entry.box.remove();
+          gaugeRegistry.delete(key);
+        }
+      });
+
+      const gaugeArea = document.getElementById('gauge-area');
+      if (clusterList.length === 0 && gaugeRegistry.size === 0) {
+        gaugeArea.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
+      } else {
+        const emptyState = gaugeArea.querySelector('.empty-state');
+        if (emptyState) {
+          emptyState.remove();
+        }
+      }
+
+      gaugesInitialized = true;
+    }
+
+    async function renderGaugesIfNeeded() {
+      if (!latestClusterList.length) {
+        return;
+      }
+
+      try {
+        await ensureChartJs();
+        await syncGauges(latestClusterList);
+      } catch (error) {
+        console.error('Failed to load latency charts', error);
+        document.getElementById('gauge-area').innerHTML =
+          '<div class="empty-state">Unable to load chart library for latency gauges.</div>';
+      }
     }
 
     function updateMetricBar(elementId, value, limit) {
       const percent = limit > 0 ? Math.min((value / limit) * 100, 100) : 0;
-      document.getElementById(elementId).style.width = `${percent}%`;
+      const fill = document.getElementById(elementId);
+      fill.style.width = `${percent}%`;
+      const wrapper = fill.parentElement;
+      wrapper.setAttribute('aria-valuenow', String(Math.round(percent)));
       return percent;
     }
 
@@ -964,6 +1327,10 @@
         panel.hidden = !isActive;
       });
 
+      if (resolvedTab === 'latency') {
+        renderGaugesIfNeeded();
+      }
+
       try {
         localStorage.setItem(tabStorageKey, resolvedTab);
       } catch (error) {
@@ -1011,14 +1378,73 @@
       tabs[nextIndex].focus();
     });
 
+    function renderClusterCards(clusterList) {
+      const clusterContainer = document.getElementById('clusters');
+
+      if (clusterList.length === 0) {
+        clusterContainer.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
+        document.getElementById('cluster-count').innerText = '0 clusters';
+        return;
+      }
+
+      clusterContainer.innerHTML = '';
+      clusterList.forEach((cluster, index) => {
+        const shardId = cluster.shard_id ?? index;
+        const color = getClusterColor(shardId);
+        const latency = Number(cluster.latency_ms ?? 0);
+        const servers = Number(cluster.servers ?? 0);
+        const users = Number(cluster.users ?? 0);
+        const density = servers > 0 ? (users / servers).toFixed(0) : '0';
+        const status = cluster.status || 'Unknown';
+        const clusterName = cluster.name || `Shard ${shardId}`;
+
+        const card = document.createElement('div');
+        card.className = 'cluster-card';
+        card.style.borderLeft = `5px solid ${color}`;
+        card.innerHTML = `
+        <div class="cluster-top">
+          <div>
+            <h3 class="cluster-name">${escapeHtml(clusterName)}</h3>
+            <p class="cluster-meta">Shard ${shardId} • ${formatNumber(latency, 0)} ms latency</p>
+          </div>
+          <div class="status-badge ${getStatusClass(status)}">${escapeHtml(status)}</div>
+        </div>
+        <div class="cluster-stats">
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Servers</div>
+            <div class="cluster-stat-value">${formatNumber(servers)}</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Users</div>
+            <div class="cluster-stat-value">${formatNumber(users)}</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Density</div>
+            <div class="cluster-stat-value">${density} users/server</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Latency</div>
+            <div class="cluster-stat-value">${formatNumber(latency, 0)} ms</div>
+          </div>
+        </div>
+      `;
+        clusterContainer.appendChild(card);
+      });
+
+      document.getElementById('cluster-count').innerText = `${clusterList.length} cluster${clusterList.length === 1 ? '' : 's'}`;
+    }
+
     async function loadClusters() {
       const requestId = ++loadRequestId;
-      const syncStatus = document.getElementById('sync-status');
-      const syncDetail = document.getElementById('sync-detail');
+      const shell = document.querySelector('.shell');
+      const hadData = latestClusterList.length > 0;
+
+      setSyncState('loading', hadData ? 'Refreshing telemetry' : 'Loading telemetry', 'Fetching latest data from /clusters');
+      shell.classList.add('is-loading');
 
       try {
         const res = await fetch('/clusters', { cache: 'no-store' });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        if (!res.ok) throw new Error(`Request failed: HTTP ${res.status}`);
 
         const data = await res.json();
         if (requestId !== loadRequestId) {
@@ -1026,6 +1452,7 @@
         }
         const sys = data.system_stats || {};
         const clusterList = Array.isArray(data.clusters) ? data.clusters : [];
+        latestClusterList = clusterList;
 
         const cpuPercent = Number(sys.cpu_total_percent ?? sys.cpu_usage_percent ?? 0);
         const ramUsed = Number(sys.ram_used_gb ?? 0);
@@ -1056,81 +1483,26 @@
 
         let globalServers = 0;
         let globalUsers = 0;
-        const clusterContainer = document.getElementById('clusters');
-        const gaugeArea = document.getElementById('gauge-area');
-        destroyGauges();
-        clusterContainer.innerHTML = '';
-        gaugeArea.innerHTML = '';
-
-        if (clusterList.length === 0) {
-          clusterContainer.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
-          document.getElementById('cluster-count').innerText = '0 clusters';
-        }
-
         clusterList.forEach(cluster => {
           globalServers += Number(cluster.servers ?? 0);
           globalUsers += Number(cluster.users ?? 0);
-
-          const shardId = cluster.shard_id ?? 0;
-          const color = shardId === 0 ? '#7aa2ff' : '#f5b971';
-
-          createGauge(shardId, cluster.name || `Shard ${shardId}`, color);
-
-          const latency = Number(cluster.latency_ms ?? 0);
-          const gauge = gauges[shardId];
-          if (gauge) {
-            gauge.data.datasets[0].data = [Math.min(latency, latencyCapMs), Math.max(0, latencyCapMs - latency)];
-            gauge.update();
-          }
-          const gaugeValue = document.getElementById(`val-${shardId}`);
-          if (gaugeValue) {
-            gaugeValue.innerText = `${formatNumber(latency, 0)} ms`;
-          }
-
-          const servers = Number(cluster.servers ?? 0);
-          const users = Number(cluster.users ?? 0);
-          const density = servers > 0 ? (users / servers).toFixed(0) : '0';
-          const status = cluster.status || 'Unknown';
-          const clusterName = cluster.name || `Shard ${shardId}`;
-
-          const card = document.createElement('div');
-          card.className = 'cluster-card';
-          card.style.borderLeft = `5px solid ${color}`;
-          card.innerHTML = `
-        <div class="cluster-top">
-          <div>
-            <h3 class="cluster-name">${escapeHtml(clusterName)}</h3>
-            <p class="cluster-meta">Shard ${shardId} • ${formatNumber(latency, 0)} ms latency</p>
-          </div>
-          <div class="status-badge ${getStatusClass(status)}">${escapeHtml(status)}</div>
-        </div>
-        <div class="cluster-stats">
-          <div class="cluster-stat">
-            <div class="cluster-stat-label">Servers</div>
-            <div class="cluster-stat-value">${formatNumber(servers)}</div>
-          </div>
-          <div class="cluster-stat">
-            <div class="cluster-stat-label">Users</div>
-            <div class="cluster-stat-value">${formatNumber(users)}</div>
-          </div>
-          <div class="cluster-stat">
-            <div class="cluster-stat-label">Density</div>
-            <div class="cluster-stat-value">${density} users/server</div>
-          </div>
-          <div class="cluster-stat">
-            <div class="cluster-stat-label">Latency</div>
-            <div class="cluster-stat-value">${formatNumber(latency, 0)} ms</div>
-          </div>
-        </div>
-      `;
-          clusterContainer.appendChild(card);
         });
+
+        renderClusterCards(clusterList);
+
+        const latencyPanel = document.getElementById('panel-latency');
+        if (!latencyPanel.hidden && gaugesInitialized) {
+          await syncGauges(clusterList);
+        } else if (!latencyPanel.hidden) {
+          await renderGaugesIfNeeded();
+        }
 
         document.getElementById('total-servers').innerText = formatNumber(globalServers);
         document.getElementById('total-users').innerText = `Total users: ${formatNumber(globalUsers)}`;
-        document.getElementById('cluster-count').innerText = `${clusterList.length} cluster${clusterList.length === 1 ? '' : 's'}`;
-        syncStatus.innerText = 'Telemetry live';
-        syncDetail.innerText = `Last refresh: ${new Date().toLocaleTimeString()}`;
+
+        const refreshedAt = new Date();
+        setSyncState('live', 'Telemetry live', `Last refresh: ${refreshedAt.toLocaleTimeString()}`);
+        shell.classList.remove('is-loading');
 
       } catch (err) {
         if (requestId !== loadRequestId) {
@@ -1138,9 +1510,9 @@
         }
 
         console.error('Failed to load cluster telemetry', err);
-        clearTelemetryDisplay('Unable to reach /clusters right now');
-        syncStatus.innerText = 'Telemetry unavailable';
-        syncDetail.innerText = 'Unable to reach /clusters right now';
+        const errorDetail = err && err.message ? err.message : 'Unable to reach /clusters right now';
+        clearTelemetryDisplay(errorDetail);
+        setSyncState('error', 'Telemetry unavailable', errorDetail);
       }
     }
 
@@ -1168,6 +1540,14 @@
       } else {
         startRefreshLoop();
       }
+    });
+
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => {
+      const isOpen = navToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
     });
   </script>
 </body>
