@@ -558,8 +558,8 @@
     <header class="hero">
       <div class="eyebrow">Jarvis Discord Bot</div>
       <h1>Cluster Status</h1>
-      <p class="subtitle">Live service telemetry from the cog endpoint at <strong>/clusters</strong> on port
-        <strong>8080</strong>, including uptime, machine health, and shard-level cluster data.
+      <p class="subtitle">Live service telemetry from the <strong>/clusters</strong> endpoint, including uptime,
+        machine health, and shard-level cluster data.
       </p>
     </header>
 
@@ -693,6 +693,15 @@
       return `${formatNumber(value, 1)}%`;
     }
 
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function getStatusClass(status) {
       const normalized = String(status || 'Unknown').toLowerCase();
       if (normalized.includes('online')) return 'status-online';
@@ -706,7 +715,7 @@
       const box = document.createElement('div');
       box.className = 'gauge-box';
       box.innerHTML = `
-    <div class="stat-label">${name} Latency</div>
+    <div class="stat-label">${escapeHtml(name)} Latency</div>
     <canvas id="gauge-${id}"></canvas>
     <div class="gauge-value-display" id="val-${id}" style="color:${color}">-- ms</div>
   `;
@@ -772,16 +781,16 @@
       const card = document.createElement('div');
       card.className = 'detail-card';
       card.innerHTML = `
-        <h3 class="detail-card-title">${title}</h3>
+        <h3 class="detail-card-title">${escapeHtml(title)}</h3>
         <div class="detail-list">
           ${rows.map(row => `
             <div class="detail-row">
-              <div class="detail-key">${row.label}</div>
-              <div class="detail-value">${row.value}</div>
+              <div class="detail-key">${escapeHtml(row.label)}</div>
+              <div class="detail-value">${escapeHtml(row.value)}</div>
             </div>
           `).join('')}
         </div>
-        ${note ? `<div class="detail-note">${note}</div>` : ''}
+        ${note ? `<div class="detail-note">${escapeHtml(note)}</div>` : ''}
       `;
       return card;
     }
@@ -1003,6 +1012,7 @@
           const users = Number(cluster.users ?? 0);
           const density = servers > 0 ? (users / servers).toFixed(0) : '0';
           const status = cluster.status || 'Unknown';
+          const clusterName = cluster.name || `Shard ${shardId}`;
 
           const card = document.createElement('div');
           card.className = 'cluster-card';
@@ -1010,10 +1020,10 @@
           card.innerHTML = `
         <div class="cluster-top">
           <div>
-            <h3 class="cluster-name">${cluster.name || `Shard ${shardId}`}</h3>
+            <h3 class="cluster-name">${escapeHtml(clusterName)}</h3>
             <p class="cluster-meta">Shard ${shardId} • ${formatNumber(latency, 0)} ms latency</p>
           </div>
-          <div class="status-badge ${getStatusClass(status)}">${status}</div>
+          <div class="status-badge ${getStatusClass(status)}">${escapeHtml(status)}</div>
         </div>
         <div class="cluster-stats">
           <div class="cluster-stat">
