@@ -1,0 +1,11 @@
+{
+  "name": "jarvis-landing-build",
+  "private": true,
+  "scripts": {
+    "test": "npm run validate:html && node scripts/validate-site.js",
+    "validate:html": "html-validate --config .htmlvalidate.json ../index.html ../clusters.html"
+  },
+  "devDependencies": {
+    "html-validate": "^9.7.0"
+  }
+}

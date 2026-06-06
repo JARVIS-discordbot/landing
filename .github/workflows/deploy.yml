@@ -4,9 +4,40 @@ on:
   push:
     branches:
       - Production
+    paths:
+      - 'index.html'
+      - 'clusters.html'
+      - 'build/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: Production
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: build/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build tests
+        run: npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +53,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DEPLOY_SERVER_IP }} >> ~/.ssh/known_hosts
 
-      # Step 1: Deploy Landing Page
       - name: Deploy to Landing Directory
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
@@ -32,8 +62,6 @@ jobs:
           rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
             ./index.html ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_SERVER_IP }}:/var/www/jarvislandingpage/landing.html
 
-      # Step 2: Deploy Clusters Dashboard
-      # Assuming you have a separate file for the clusters page in your repo
       - name: Deploy to Clusters Directory
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
