@@ -1,0 +1,12 @@
+{
+  "extends": ["html-validate:recommended"],
+  "rules": {
+    "require-sri": "off",
+    "no-inline-style": "off",
+    "script-type": "off",
+    "void-style": "off",
+    "attribute-boolean-style": "off",
+    "prefer-native-element": "off",
+    "no-missing-references": "off"
+  }
+}
