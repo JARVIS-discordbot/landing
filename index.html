@@ -806,7 +806,7 @@
           <span>System Links</span>
           <span class="status-dot" aria-hidden="true"></span>
         </div>
-        <nav id="btnContainer" aria-label="More links"></nav>
+        <nav id="sysLinks" aria-label="More links"></nav>
       </div>
 
       <aside class="airplanes-note">
@@ -843,7 +843,7 @@
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const container = document.getElementById('btnContainer');
+    const container = document.getElementById('sysLinks');
     const fragment = document.createDocumentFragment();
     links.forEach((btn, index) => {
       const a = document.createElement('a');
