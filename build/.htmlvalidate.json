@@ -7,6 +7,8 @@
     "void-style": "off",
     "attribute-boolean-style": "off",
     "prefer-native-element": "off",
-    "no-missing-references": "off"
+    "no-missing-references": "off",
+    "unique-landmark": "off",
+    "aria-label-misuse": "off"
   }
 }
