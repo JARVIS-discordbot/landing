@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jarvis Discord Bot &mdash; Landing Page</title>
+  <title>Jarvis Discord Bot Landing Page</title>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNS0C9K0YJ"></script>
@@ -15,125 +15,253 @@
   gtag('config', 'G-DNS0C9K0YJ');
 </script>
 
-  <meta name="description" content="Jarvis Discord Bot &mdash; The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
+  <meta name="description" content="Jarvis Discord Bot. The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
   <meta name="keywords" content="Discord bot, Jarvis bot, Discord moderation, commands, dashboard" />
   <meta name="author" content="Jarvis Discord Bot Team" />
   <link rel="canonical" href="https://jarvisdiscordbot.net/" />
 
-  <meta property="og:title" content="Jarvis Discord Bot &mdash; Landing Page" />
-  <meta property="og:description" content="The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable." />
+  <meta property="og:title" content="Jarvis Discord Bot Landing Page" />
+  <meta property="og:description" content="The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jarvisdiscordbot.net/" />
   <meta property="og:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Jarvis Discord Bot &mdash; Landing Page" />
-  <meta name="twitter:description" content="The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable." />
+  <meta name="twitter:title" content="Jarvis Discord Bot Landing Page" />
+  <meta name="twitter:description" content="The best bot for your Discord server. Easy to use, packed with features, and always reliable." />
   <meta name="twitter:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
 
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: "#eef2ff",
+              100: "#e0e7ff",
+              300: "#a5b4fc",
+              400: "#818cf8",
+              500: "#6366f1",
+              600: "#4f46e5",
+              700: "#4338ca",
+              900: "#1e1b4b"
+            }
+          },
+          boxShadow: {
+            glow: "0 0 40px rgba(99, 102, 241, 0.28)"
+          },
+          animation: {
+            float: "float 4s ease-in-out infinite",
+            "fade-up": "fadeUp 0.8s ease-out both",
+            "pulse-soft": "pulseSoft 8s ease-in-out infinite"
+          },
+          keyframes: {
+            float: {
+              "0%, 100%": { transform: "translateY(0px)" },
+              "50%": { transform: "translateY(-10px)" }
+            },
+            fadeUp: {
+              from: { opacity: "0", transform: "translateY(24px)" },
+              to: { opacity: "1", transform: "translateY(0)" }
+            },
+            pulseSoft: {
+              "0%, 100%": { opacity: "0.45" },
+              "50%": { opacity: "0.9" }
+            }
+          }
+        }
+      }
+    };
+  </script>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); color:#fff; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; padding:120px 20px 40px; position:relative; overflow-x:hidden; }
-    body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle at 20% 80%, rgba(114,137,218,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(114,137,218,0.08) 0%, transparent 50%); z-index:-1; animation:backgroundPulse 8s ease-in-out infinite; }
-    @keyframes backgroundPulse {0%,100%{opacity:0.8;}50%{opacity:1;}}
-    @keyframes fadeInUp {from{opacity:0; transform:translateY(30px);}to{opacity:1; transform:translateY(0);}}
-    @keyframes float {0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);}}
-    @keyframes glow {0%,100%{box-shadow:0 0 20px rgba(114,137,218,0.4);}50%{box-shadow:0 0 30px rgba(114,137,218,0.6);}}
-    @keyframes gradientShift {0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
-    @keyframes slideInLeft {from{opacity:0;transform:translateX(-100px);}to{opacity:1;transform:translateX(0);}}
-    @keyframes particleFloat {0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100px) rotate(360deg);opacity:0;}}
-    @keyframes slideInDown {from{opacity:0;transform:translateY(-100%);}to{opacity:1;transform:translateY(0);}}
-    .btn:active { transform:translateY(-1px) scale(1.01); }
+    html {
+      scroll-behavior: smooth;
+    }
 
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
 
+    .particle {
+      position: absolute;
+      border-radius: 9999px;
+      background: rgba(129, 140, 248, 0.25);
+      animation: particleFloat linear infinite;
+    }
 
+    .mobile-menu {
+      display: none;
+    }
 
-    #contentWrapper { max-width:700px;width:100%; animation:fadeInUp 1s ease-out; margin:60px 0; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .avatar { width:140px;height:140px;border-radius:50%;margin-bottom:30px;border:4px solid rgba(114,137,218,0.3); animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite; transition: transform 0.3s ease; }
-    .avatar:hover { transform:scale(1.05); }
-    h1 { font-size:3.5rem; background:linear-gradient(45deg,#7289da,#5865f2,#7289da); background-size:200% 200%; background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; letter-spacing:2px; font-weight:700; animation:gradientShift 3s ease-in-out infinite;}
-    h2 { font-size:1.8rem; color:#a3b3ff; margin-bottom:25px; font-weight:400; opacity:0.9; }
-    p.description { font-size:1.3rem; margin-bottom:40px; color:#c9d1f0; line-height:1.6; max-width:600px; margin-left:auto; margin-right:auto; }
-    .btn-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px; margin-bottom:50px; max-width:900px; width:100%; }
-    .btn { display:flex; align-items:center; justify-content:center; width:100%; padding:20px 24px; background:linear-gradient(135deg,#7289da 0%,#5865f2 100%); color:#fff; font-weight:700; font-size:1.15rem; border-radius:14px; box-shadow:0 8px 25px rgba(114,137,218,0.3); transition:all 0.3s ease; cursor:pointer; text-align:center; position:relative; overflow:hidden; border:2px solid transparent; min-height:60px; text-decoration:none; }
-    .btn::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transition:left 0.5s; }
-    .btn:hover::before { left:100%; }
-    .btn:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 12px 35px rgba(114,137,218,0.4); border-color:rgba(255,255,255,0.2); }
-    .btn:active { transform:translateY(-1px) scale(1.01); }
+    .mobile-menu.active {
+      display: block;
+    }
 
-    footer { font-size:0.95rem; color:#8892b0; text-align:center; line-height:1.8; background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); margin-top:60px; position:relative; z-index:10; }
-    footer a { color:#7289da; text-decoration:none; margin:0 10px; transition:color 0.3s ease; }
-    footer a:hover { color:#5865f2; text-decoration:underline; }
-
-    .airplanes-note { position:fixed; top:90px; left:25px; z-index:1001; background:linear-gradient(135deg, rgba(44,47,54,0.95) 0%, rgba(32,34,37,0.95) 100%); color:#fff; font-size:1.1rem; font-weight:600; border-radius:15px; box-shadow:0 8px 32px rgba(0,0,0,0.3); padding:18px 24px; border:1px solid rgba(114,137,218,0.3); text-align:left; max-width:340px; line-height:1.6; backdrop-filter:blur(10px); animation:slideInLeft 0.5s ease-out; }
-    .airplanes-note a { color:#7289da; font-weight:bold; text-decoration:none; transition:color 0.3s ease; }
-    .airplanes-note a:hover { color:#5865f2; text-decoration:underline; }
-
-    .particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1; }
-    .particle { position:absolute; width:4px; height:4px; background:rgba(114,137,218,0.3); border-radius:50%; animation:particleFloat 15s linear infinite; }
-
-    .navbar { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(26,26,46,0.95); backdrop-filter:blur(20px); border-bottom:1px solid rgba(114,137,218,0.2); padding:0; animation:slideInDown 0.6s ease-out;}
-    .nav-container { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:15px 20px; }
-    .nav-logo { display:flex; align-items:center; gap:12px; font-size:1.4rem; font-weight:700; color:#fff; }
-    .nav-avatar { width:40px; height:40px; border-radius:50%; border:2px solid rgba(114,137,218,0.3); transition:transform 0.3s ease; }
-    .nav-avatar:hover { transform:scale(1.1); }
-    .nav-links { display:flex; gap:30px; align-items:center; }
-    .nav-link { color:#c9d1f0; text-decoration:none; font-weight:500; font-size:1rem; padding:8px 16px; border-radius:8px; position:relative; overflow:hidden; transition:all 0.3s ease; }
-    .nav-link::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, rgba(114,137,218,0.1), transparent); transition:left 0.5s; }
-    .nav-link:hover::before { left:100%; }
-    .nav-link:hover { color:#7289da; background:rgba(114,137,218,0.1); transform:translateY(-2px); }
-    .nav-toggle { display:none; flex-direction:column; cursor:pointer; padding:4px; }
-    .nav-toggle span { width:25px; height:3px; background:#7289da; margin:3px 0; border-radius:2px; transition:0.3s;}
-    .nav-toggle.active span:nth-child(1){transform:rotate(-45deg) translate(-5px,6px);}
-    .nav-toggle.active span:nth-child(2){opacity:0;}
-    .nav-toggle.active span:nth-child(3){transform:rotate(45deg) translate(-5px,-6px);}
-    @media(max-width:768px){h1{font-size:2.8rem;} h2{font-size:1.5rem;} .btn-container{grid-template-columns:1fr;gap:20px;max-width:100%;} .btn{padding:18px 20px;font-size:1.1rem;min-height:56px;} .airplanes-note{display:none;} .avatar{width:120px;height:120px;} .nav-links{position:fixed;top:70px;left:0;right:0;background:rgba(26,26,46,0.98);backdrop-filter:blur(20px);flex-direction:column;padding:20px;gap:15px;transform:translateY(-100%);opacity:0;visibility:hidden;transition:all 0.3s ease;border-bottom:1px solid rgba(114,137,218,0.2);} .nav-links.active{transform:translateY(0);opacity:1;visibility:visible;} .nav-toggle{display:flex;} .nav-link{width:100%;text-align:center;padding:12px;border:1px solid rgba(114,137,218,0.2);}}
-    @media(max-width:480px){h1{font-size:2.4rem;} h2{font-size:1.3rem;} p.description{font-size:1.1rem;} body{padding:100px 15px 40px;} #contentWrapper{margin:40px 0 80px 0;}}
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10%,
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
-<body>
-  <div class="particles" id="particles"></div>
+<body class="min-h-screen overflow-x-hidden bg-slate-950 text-white selection:bg-brand-500/30 selection:text-white">
+  <div class="pointer-events-none fixed inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.24),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.18),_transparent_28%),linear-gradient(135deg,_#020617_0%,_#0f172a_45%,_#111827_100%)]"></div>
+  <div class="pointer-events-none fixed inset-0 -z-10 animate-pulse-soft bg-[radial-gradient(circle_at_20%_80%,_rgba(129,140,248,0.14),_transparent_28%),radial-gradient(circle_at_80%_20%,_rgba(56,189,248,0.12),_transparent_24%)]"></div>
+  <div class="pointer-events-none fixed inset-0 -z-10" id="particles" aria-hidden="true"></div>
 
-  <nav class="navbar">
-    <div class="nav-container">
-      <div class="nav-logo">
-        <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Bot" class="nav-avatar">
-        <span>Jarvis Bot</span>
-      </div>
-      <div class="nav-links">
-        <a href="https://dash.jarvisdiscordbot.net/" class="nav-link">Dashboard</a>
-        <a href="https://dash.jarvisdiscordbot.net/commands" class="nav-link">Commands</a>
-        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" class="nav-link">Support</a>
-        <a href="https://status.jarvisdiscordbot.net/" target="_blank" class="nav-link">Status</a>
-        <a href="https://clusters.jarvisdiscordbot.net/" target="_blank" class="nav-link">Cluster Info</a>
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Primary">
+      <a href="#top" class="flex items-center gap-3">
+        <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Bot" class="h-11 w-11 rounded-full border border-brand-400/40 shadow-glow">
+        <div class="text-left">
+          <span class="block text-base font-semibold tracking-wide text-white">Jarvis Bot</span>
+          <span class="block text-xs uppercase tracking-[0.24em] text-brand-200/80">Discord automation</span>
+        </div>
+      </a>
 
+      <div class="hidden items-center gap-2 md:flex">
+        <a href="https://dash.jarvisdiscordbot.net/" class="rounded-full px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Dashboard</a>
+        <a href="https://dash.jarvisdiscordbot.net/commands" class="rounded-full px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Commands</a>
+        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" rel="noopener noreferrer" class="rounded-full px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Support</a>
+        <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="rounded-full px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Status</a>
+        <a href="https://clusters.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="rounded-full px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Cluster Info</a>
       </div>
-      <div class="nav-toggle" id="navToggle">
-        <span></span><span></span><span></span>
+
+      <button id="navToggle" type="button" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-3 text-brand-200 transition hover:bg-white/10 md:hidden" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+        <svg id="menuOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="menuCloseIcon" xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu border-t border-white/10 bg-slate-950/95 px-4 py-4 backdrop-blur md:hidden">
+      <div class="mx-auto flex max-w-7xl flex-col gap-2">
+        <a href="https://dash.jarvisdiscordbot.net/" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Dashboard</a>
+        <a href="https://dash.jarvisdiscordbot.net/commands" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Commands</a>
+        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" rel="noopener noreferrer" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Support</a>
+        <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Status</a>
+        <a href="https://clusters.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="rounded-xl px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white">Cluster Info</a>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <div id="contentWrapper">
-    <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Discord Bot Avatar" class="avatar">
-    <h1>Jarvis Discord Bot</h1>
-    <h2>Your Ultimate Discord Companion</h2>
-    <p class="description">The best bot for your Discord server &mdash; easy to use, packed with features, and always reliable.</p>
+  <main id="top" class="relative">
+    <section class="mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pt-16 lg:px-8">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
+        <div class="animate-fade-up">
+          <div class="mb-6 inline-flex items-center rounded-full border border-brand-400/30 bg-brand-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-100">
+            Powerful Discord server management
+          </div>
+          <h1 class="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Jarvis Discord Bot
+            <span class="block bg-gradient-to-r from-brand-300 via-sky-300 to-brand-500 bg-clip-text text-transparent">
+              Your Ultimate Discord Companion
+            </span>
+          </h1>
+          <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl">
+            The best bot for your Discord server. Easy to use, packed with features, and always reliable.
+            Manage your community, explore commands, monitor service status, and get quick access to the Jarvis tools your server depends on.
+          </p>
 
-    <div class="btn-container" id="btnContainer"></div>
+          <div class="mt-8 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Fast setup</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Invite Jarvis and start using moderation, utility, and server tools in minutes.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Helpful dashboard</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Manage your bot settings, review commands, and access live service information.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Reliable ecosystem</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Support, status, cluster visibility, and useful companion tools are all one click away.</p>
+            </div>
+          </div>
+        </div>
 
-    <div class="airplanes-note">
-      <span style="color: #7289da; font-weight: bold;">Note:</span> Jarvis Discord Bot uses data from
-      <a href="https://airplanes.live" target="_blank" rel="noopener noreferrer">airplanes.live</a>.
-      <span style="font-weight: 400;">Learn more and support them.</span>
+        <aside class="animate-fade-up rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl" style="animation-delay: 0.12s;">
+          <div class="flex flex-col items-center text-center">
+            <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Discord Bot Avatar" class="h-32 w-32 animate-float rounded-full border-4 border-brand-400/30 object-cover shadow-glow sm:h-36 sm:w-36">
+            <h2 class="mt-5 text-2xl font-bold text-white">Ready to add Jarvis?</h2>
+            <p class="mt-3 max-w-sm text-sm leading-6 text-slate-300">
+              Use the quick links below to invite the bot, open the dashboard, join support, or explore Jarvis resources.
+            </p>
+          </div>
+
+          <div class="mt-8 grid gap-4" id="btnContainer" aria-label="Jarvis quick links"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div class="rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur">
+          <h2 class="text-2xl font-bold text-white">What you can do with Jarvis</h2>
+          <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
+            Jarvis brings together moderation access, command discovery, operational visibility, and extra utility pages so your Discord community has a cleaner and more dependable experience.
+          </p>
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 class="text-base font-semibold text-white">Community management</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Access commands and dashboard controls designed to help you run your server more smoothly.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 class="text-base font-semibold text-white">Live service visibility</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Check status and cluster information when you need to confirm uptime and current service health.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 class="text-base font-semibold text-white">Extra utility tools</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Use the linked companion tools such as E-Number Lookup for useful extras beyond the bot itself.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 class="text-base font-semibold text-white">Support when you need it</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Join the support server to get help, updates, and answers from the Jarvis community.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="rounded-3xl border border-brand-400/20 bg-brand-500/10 p-6 backdrop-blur">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-brand-100">Data note</p>
+          <p class="mt-3 text-sm leading-7 text-slate-200">
+            Jarvis Discord Bot uses data from
+            <a href="https://airplanes.live" target="_blank" rel="noopener noreferrer" class="font-semibold text-sky-300 underline decoration-sky-400/40 underline-offset-4 transition hover:text-sky-200">
+              airplanes.live
+            </a>.
+            Learn more about the project and support them if you can.
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mx-auto mt-10 max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+    <div class="rounded-3xl border border-white/10 bg-white/5 px-6 py-5 text-center text-sm leading-7 text-slate-400 backdrop-blur">
+      <p>&copy; 2026 Jarvis Discord Bot</p>
+      <p class="mt-1">
+        Built by
+        <a href="https://kieranl29productions.co.uk/" target="_blank" rel="noopener noreferrer" class="font-medium text-brand-200 transition hover:text-white">
+          Kieranl29 Productions
+        </a>
+      </p>
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <a href="https://dash.jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer" aria-label="Read our Terms of Service" class="text-brand-200 transition hover:text-white">Terms of Service</a>
+        <span class="text-slate-600">|</span>
+        <a href="https://dash.jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer" aria-label="Read our Privacy Policy" class="text-brand-200 transition hover:text-white">Privacy Policy</a>
+      </div>
     </div>
-  </div>
-
-  <footer>
-    &copy; 2026 Jarvis Discord Bot
-    <br />
-    <a href="https://dash.jarvisdiscordbot.net/custom-page/tos" target="_blank" rel="noopener noreferrer" aria-label="Read our Terms of Service">Terms of Service</a> |
-    <a href="https://dash.jarvisdiscordbot.net/custom-page/privacy" target="_blank" rel="noopener noreferrer" aria-label="Read our Privacy Policy">Privacy Policy</a>
   </footer>
 
   <script>
@@ -152,14 +280,15 @@
     const container = document.getElementById('btnContainer');
     buttons.forEach((btn,index)=>{
       const a=document.createElement('a');
-      a.className='btn';
+      a.className='group relative flex min-h-[62px] items-center justify-between gap-3 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-brand-500 to-brand-600 px-5 py-4 text-left text-base font-semibold text-white shadow-lg shadow-brand-950/30 transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:from-brand-400 hover:to-brand-500 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-brand-300/70';
       a.textContent=btn.text;
       a.href=btn.href;
       if(btn.target)a.target=btn.target;
       if(btn.rel)a.rel=btn.rel;
       if(btn.ariaLabel)a.setAttribute('aria-label',btn.ariaLabel);
       a.style.animationDelay=`${index*0.1}s`;
-      a.style.animation='fadeInUp 0.6s ease-out both';
+      a.style.animation='fadeUp 0.6s ease-out both';
+      a.innerHTML = `<span>${btn.text}</span><span aria-hidden="true" class="text-lg text-white/80 transition group-hover:translate-x-1 group-hover:text-white">&rarr;</span>`;
       container.appendChild(a);
     });
 
@@ -173,19 +302,23 @@
         p.style.animationDuration=(10+Math.random()*10)+'s';
         p.style.width=2+Math.random()*4+'px';
         p.style.height=p.style.width;
+        p.style.animationDelay=(Math.random()*8)+'s';
         particlesContainer.appendChild(p);
       }
     }
     createParticles();
 
     const navToggle = document.getElementById('navToggle');
-    const navLinks = document.querySelector('.nav-links');
-    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active'); navLinks.classList.toggle('active');});
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuOpenIcon = document.getElementById('menuOpenIcon');
+    const menuCloseIcon = document.getElementById('menuCloseIcon');
+    navToggle.addEventListener('click',()=>{
+      const isOpen = mobileMenu.classList.toggle('active');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      menuOpenIcon.classList.toggle('hidden', isOpen);
+      menuCloseIcon.classList.toggle('hidden', !isOpen);
+    });
   </script>
 
 </body>
 </html>
-
-
-
-
