@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Flight Radar - Live Split-Flap Display</title>
+  <style>
+    :root {
+      --bg: #030303;
+      --board-bg: rgb(20, 20, 20);
+      --text: #eee;
+      --panel-bg: rgb(22, 22, 22);
+      --border: #333;
+    }
+
+    body.theme-oled {
+      --bg: #030303;
+      --board-bg: rgb(15, 15, 15);
+      --text: #eee;
+      --panel-bg: rgb(20, 20, 20);
+      --border: #333;
+    }
+
+    body.theme-amber {
+      --bg: #100600;
+      --board-bg: rgb(25, 12, 0);
+      --text: #ffb000;
+      --panel-bg: rgb(35, 18, 0);
+      --border: #663300;
+    }
+
+    body.theme-blue {
+      --bg: #000814;
+      --board-bg: rgb(0, 16, 32);
+      --text: #4da6ff;
+      --panel-bg: rgb(0, 24, 48);
+      --border: #004080;
+    }
+
+    body.theme-ivory {
+      --bg: #e6e6e6;
+      --board-bg: rgb(210, 210, 210);
+      --text: #1a1a1a;
+      --panel-bg: rgb(240, 240, 240);
+      --border: #bbb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      font-family: Helvetica, Arial, sans-serif;
+      color: var(--text);
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      padding: 10px;
+    }
+
+    #board-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4vh;
+    }
+
+    /* ===== PUBLIC SITE HEADER & RADAR HUD ===== */
+    #site-header {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .interactive-element {
+      pointer-events: auto;
+    }
+
+    .brand-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Larger Bottom-Left Radar HUD */
+    #radar-hud {
+      position: fixed;
+      bottom: 55px;
+      left: 16px;
+      width: 130px;
+      height: 130px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1.5px solid var(--border);
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), inset 0 0 12px rgba(0, 255, 100, 0.2);
+      z-index: 100;
+      pointer-events: auto;
+    }
+
+    #radar-hud::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      transform: translate(-50%, -50%);
+    }
+
+    #radar-hud::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1px;
+      height: 100%;
+      background: var(--border);
+      transform: translate(-50%, -50%);
+    }
+
+    .radar-sweep {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120px;
+      height: 120px;
+      margin-top: -60px;
+      margin-left: -60px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg at 50% 50%, rgba(77, 166, 255, 0.3) 0deg, transparent 60deg, transparent 360deg);
+      animation: radar-sweep-anim 4s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes radar-sweep-anim {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .radar-blip {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: #ff3333;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 5px #ff3333;
+      transition: all 0.3s ease;
+    }
+
+    .radar-blip.active {
+      background: #00ff66;
+      box-shadow: 0 0 8px #00ff66;
+      width: 7px;
+      height: 7px;
+      z-index: 2;
+    }
+
+    .compass-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--text);
+      border-radius: 50%;
+      position: relative;
+      transition: transform 0.5s ease;
+    }
+
+    .compass-icon::after {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 5px;
+      width: 2px;
+      height: 6px;
+      background: var(--text);
+    }
+
+    #controls-bar {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .ui-group {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .ui-btn {
+      background: var(--panel-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      opacity: 0.7;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .ui-btn:hover {
+      opacity: 1;
+      filter: brightness(1.2);
+    }
+
+    #status {
+      font-size: 11px;
+      opacity: 0.7;
+      font-family: monospace;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== DEPARTURE BOARD STYLING ===== */
+    .departure-board {
+      padding: 0.3em 0.4em;
+      display: inline-block;
+      line-height: 1.3em;
+      background: var(--board-bg);
+      border-radius: 0.3em;
+      color: var(--text);
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .departure-board .row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .departure-board span.letter {
+      display: inline-block;
+      width: 0.95em;
+      margin: 0 0.08em;
+      height: 1.3em;
+      text-align: center;
+      position: relative;
+      box-shadow:
+        inset 0 -.07em 0 rgba(50, 50, 50, .7),
+        inset 0 -.14em 0 rgba(0, 0, 0, .7),
+        inset .14em 0 .28em rgba(0, 0, 0, .5),
+        inset -.14em 0 .28em rgba(0, 0, 0, .5),
+        0 .07em 0 rgba(255, 255, 255, .1);
+    }
+
+    .departure-board span.letter:before {
+      border-top: .07em solid rgba(0, 0, 0, .4);
+      border-bottom: .07em solid rgba(255, 255, 255, .05);
+      height: 0;
+      position: relative;
+      width: 100%;
+      left: 0;
+      top: .62em;
+      content: " ";
+      display: block;
+      z-index: 2;
+      transform: translate(0, -.05em);
+    }
+
+    .departure-board span.fold {
+      display: block;
+      position: absolute;
+      height: 0;
+      top: .65em;
+    }
+
+    .departure-board span.flap {
+      display: block;
+      position: absolute;
+      top: 0em;
+      width: 0.95em;
+      height: .65em;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .departure-board span.text {
+      width: 100%;
+    }
+
+    .departure-board span.bottom {
+      top: .65em;
+    }
+
+    .departure-board span.bottom span.text {
+      position: relative;
+      top: -.65em;
+    }
+
+    .departure-board span.flap.falling {
+      display: none;
+      bottom: 0;
+      top: auto;
+    }
+
+    .departure-board span.flap.falling span.text {
+      backface-visibility: hidden;
+      border-top: .03em solid var(--border);
+      border-bottom: .03em solid var(--border);
+      background: var(--board-bg);
+      display: block;
+      position: relative;
+      transform: scaleY(1);
+      transition: transform linear;
+    }
+
+    #board-container .departure-board {
+      font-size: clamp(0.8rem, 2.7vw, 2.8rem);
+    }
+
+    /* ===== CONFIG OVERLAY ===== */
+    #config-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    #config-overlay.visible {
+      display: flex;
+    }
+
+    #config-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.5em;
+      padding: 2em 2.5em;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+      min-width: 360px;
+      max-width: 90vw;
+      color: var(--text);
+    }
+
+    #config-panel h2 {
+      font-size: 1.1em;
+      margin-bottom: 1.2em;
+      text-align: center;
+      font-weight: normal;
+      letter-spacing: 0.1em;
+    }
+
+    .config-field {
+      margin-bottom: 1.1em;
+    }
+
+    .config-field label {
+      display: block;
+      font-size: 0.75em;
+      opacity: 0.7;
+      margin-bottom: 0.3em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .config-field input,
+    .config-field select {
+      width: 100%;
+      padding: 0.6em 0.8em;
+      font-size: 1em;
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 0.25em;
+      outline: none;
+    }
+
+    .config-presets {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.2em;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: 0.75em;
+      border-radius: 3px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .preset-btn:hover {
+      opacity: 1;
+    }
+
+    .config-hint {
+      margin-top: 1.2em;
+      text-align: center;
+      font-size: 0.75em;
+      opacity: 0.5;
+    }
+
+    .config-error {
+      margin-top: 0.4em;
+      text-align: center;
+      font-size: 0.75em;
+      color: #e74c3c;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+
+<body class="theme-oled">
+
+  <!-- Public Site Header -->
+  <header id="site-header">
+    <div class="brand-title interactive-element">
+      <span id="compass-glyph" class="compass-icon"></span> FLIGHT-BOARD.LIVE
+    </div>
+    <div id="location-indicator" class="brand-title interactive-element" style="font-size: 0.75rem; opacity: 0.6;">
+    </div>
+  </header>
+
+  <!-- Larger Bottom-Left Radar HUD Screen -->
+  <div id="radar-hud" title="Live Airspace Radar HUD">
+    <div class="radar-sweep"></div>
+    <div id="radar-blips-container"></div>
+  </div>
+
+  <div id="app">
+    <div id="board-container"></div>
+  </div>
+
+  <!-- Public Site Footer Controls -->
+  <footer id="controls-bar">
+    <div id="status" class="interactive-element">STATUS: INITIALIZING... [SPACE: PAUSE | ARROWS: MANUAL]</div>
+    <div class="ui-group">
+      <button id="audio-btn" class="ui-btn" onclick="toggleAudio()">🔊 Audio: ON</button>
+      <button id="config-btn" class="ui-btn" onclick="openConfig()">⚙ Location & Theme</button>
+      <button id="fullscreen-btn" class="ui-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </footer>
+
+  <!-- Config Overlay -->
+  <div id="config-overlay">
+    <div id="config-panel">
+      <h2>STATION CONFIGURATION</h2>
+
+      <div class="config-presets">
+        <span style="font-size:0.75em; opacity:0.7; width:100%; margin-bottom:2px;">Popular Airspaces:</span>
+        <button class="preset-btn" onclick="setPreset(40.7128, -74.0060, 'New York')">New York</button>
+        <button class="preset-btn" onclick="setPreset(51.5074, -0.1278, 'London')">London</button>
+        <button class="preset-btn" onclick="setPreset(35.6762, 139.6503, 'Tokyo')">Tokyo</button>
+        <button class="preset-btn" onclick="setPreset(-33.8688, 151.2093, 'Sydney')">Sydney</button>
+        <button class="preset-btn" onclick="setPreset(48.8566, 2.3522, 'Paris')">Paris</button>
+      </div>
+
+      <div class="config-field">
+        <label for="config-theme">Display Aesthetic</label>
+        <select id="config-theme" onchange="changeTheme(this.value)">
+          <option value="theme-oled">OLED Pure Dark</option>
+          <option value="theme-amber">Retro Airport Amber</option>
+          <option value="theme-blue">Classic Airline Blue</option>
+          <option value="theme-ivory">Terminal Ivory</option>
+        </select>
+      </div>
+
+      <div class="config-field">
+        <label for="config-lat">Radar Latitude</label>
+        <input type="number" id="config-lat" step="0.0001" placeholder="e.g. 40.7128">
+      </div>
+
+      <div class="config-field">
+        <label for="config-lon">Radar Longitude</label>
+        <input type="number" id="config-lon" step="0.0001" placeholder="e.g. -74.0060">
+      </div>
+
+      <div class="config-field">
+        <button class="preset-btn" style="width:100%; padding:9px; font-weight:bold; background:var(--panel-bg);"
+          onclick="requestBrowserLocation()">📍 Use Current Device GPS</button>
+      </div>
+
+      <div class="config-error" id="config-error"></div>
+
+      <div class="config-hint">
+        Click outside or press <strong>ESC</strong> to close &nbsp;|&nbsp; Changes apply instantly
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================
+        WEB AUDIO API SYNTHESIZED FLAP SOUNDS
+        ========================================================== */
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playFlapSound() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx || audioCtx.state !== 'running') return;
+
+        const bufferSize = audioCtx.sampleRate * 0.02;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1400;
+        filter.Q.value = 2;
+
+        const gain = audioCtx.createGain();
+        gain.gain.value = 0.12;
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        noise.start();
+      } catch (e) { }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) initAudio();
+      document.getElementById('audio-btn').textContent = soundEnabled ? '🔊 Audio: ON' : '🔇 Audio: OFF';
+    }
+
+    /* ==========================================================
+        DEPARTURE BOARD ENGINE
+        ========================================================== */
+    var DepartureBoard = function (element, options) {
+      options = options || {};
+      this._element = element;
+      this._letters = [];
+      this._pendingTimeouts = [];
+      element.className += ' departure-board';
+
+      var rowCount = options.rowCount || 1;
+      var letterCount = options.letterCount || 30;
+      var letter, rowElement;
+
+      for (var r = 0; r < rowCount; r++) {
+        this._letters.push([]);
+        rowElement = document.createElement('div');
+        rowElement.className = 'row';
+        element.appendChild(rowElement);
+
+        for (var l = 0; l < letterCount; l++) {
+          letter = new DepartureBoard.Letter();
+          this._letters[r].push(letter);
+          rowElement.appendChild(letter.getElement());
+        }
+      }
+    };
+
+    DepartureBoard.LETTERS = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,':()&!?+-=/";
+
+    DepartureBoard.prototype.cancelPending = function () {
+      for (var i = 0; i < this._pendingTimeouts.length; i++) {
+        clearTimeout(this._pendingTimeouts[i]);
+      }
+      this._pendingTimeouts = [];
+    };
+
+    DepartureBoard.prototype.setValueInstant = function (value) {
+      this.cancelPending();
+      if (!(value instanceof Array)) value = [value];
+      for (var r = 0, rl = this._letters.length; r < rl; r++) {
+        value[r] = value[r] ? value[r].toUpperCase() : '';
+        for (var i = 0, l = this._letters[r].length; i < l; i++) {
+          var letterValue = value[r].substr(i, 1) || '';
+          this._letters[r][i].setValueInstant(letterValue);
+        }
+      }
+    };
+
+    DepartureBoard.prototype.setValue = function (value) {
+      this.cancelPending();
+      if (!(value instanceof Array)) value = [value];
+      var me = this;
+
+      for (var r = 0, rl = this._letters.length; r < rl; r++) {
+        value[r] = value[r] ? value[r].toUpperCase() : '';
+
+        for (var i = 0, l = this._letters[r].length; i < l; i++) {
+          (function (r, i) {
+            var delay = 8 * i + Math.random() * 30;
+            var timeoutId = window.setTimeout(function () {
+              var letterValue = value[r].substr(i, 1) || '';
+              me._letters[r][i].setValue(letterValue);
+            }, delay);
+            me._pendingTimeouts.push(timeoutId);
+          })(r, i);
+        }
+      }
+    };
+
+    DepartureBoard.Letter = function () {
+      this._element = document.createElement('span');
+      this._element.className = 'letter';
+
+      this._bottom = document.createElement('span');
+      this._bottom.className = 'flap bottom';
+      this._element.appendChild(this._bottom);
+
+      this._bottomText = document.createElement('span');
+      this._bottomText.className = 'text';
+      this._bottom.appendChild(this._bottomText);
+
+      this._top = document.createElement('span');
+      this._top.className = 'flap top';
+      this._element.appendChild(this._top);
+
+      this._topText = document.createElement('span');
+      this._topText.className = 'text';
+      this._top.appendChild(this._topText);
+
+      this._fold = document.createElement('span');
+      this._fold.className = 'fold';
+      this._element.appendChild(this._fold);
+
+      this._falling = document.createElement('span');
+      this._falling.className = 'flap falling';
+      this._fold.appendChild(this._falling);
+
+      this._fallingText = document.createElement('span');
+      this._fallingText.className = 'text';
+      this._fallingText.style.transitionDuration = DepartureBoard.Letter.DROP_TIME * 0.5 + 'ms';
+      this._falling.appendChild(this._fallingText);
+
+      this._index = 0;
+      this._interval = null;
+      this._stopAt = null;
+    };
+
+    DepartureBoard.Letter.DROP_TIME = 90;
+
+    DepartureBoard.Letter.prototype.getElement = function () {
+      return this._element;
+    };
+
+    DepartureBoard.Letter.prototype.setValueInstant = function (value) {
+      if (this._interval) {
+        clearInterval(this._interval);
+        this._interval = null;
+      }
+      this._stopAt = null;
+      this._index = DepartureBoard.LETTERS.indexOf(value);
+      if (this._index < 0) this._index = 0;
+      var ch = DepartureBoard.LETTERS.charAt(this._index);
+      this._topText.innerHTML = ch;
+      this._bottomText.innerHTML = ch;
+    };
+
+    DepartureBoard.Letter.prototype.setValue = function (value) {
+      var targetIndex = DepartureBoard.LETTERS.indexOf(value);
+      if (targetIndex < 0) targetIndex = 0;
+
+      if (targetIndex === this._index && !this._interval) return;
+
+      if (this._interval) {
+        clearInterval(this._interval);
+        this._interval = null;
+      }
+
+      this._stopAt = targetIndex;
+      this.spin(false);
+    };
+
+    DepartureBoard.Letter.prototype.spin = function (clear) {
+      if (clear !== false) this._stopAt = null;
+      var me = this;
+      this._interval = window.setInterval(function () { me._tick(); }, DepartureBoard.Letter.DROP_TIME * 1.1);
+    };
+
+    DepartureBoard.Letter.prototype._tick = function () {
+      playFlapSound();
+      var me = this,
+        oldValue = DepartureBoard.LETTERS.charAt(this._index),
+        fallingStyle = this._falling.style,
+        fallingTextStyle = this._fallingText.style,
+        newValue;
+
+      this._index = (this._index + 1) % DepartureBoard.LETTERS.length;
+      newValue = DepartureBoard.LETTERS.charAt(this._index);
+
+      this._fallingText.innerHTML = oldValue;
+      fallingStyle.display = 'block';
+
+      this._topText.innerHTML = newValue;
+
+      window.setTimeout(function () {
+        fallingTextStyle.transitionTimingFunction = 'ease-in';
+        fallingTextStyle.transform = 'scaleY(0)';
+      }, 1);
+
+      window.setTimeout(function () {
+        me._fallingText.innerHTML = newValue;
+        fallingStyle.top = '-.03em';
+        fallingStyle.bottom = 'auto';
+        fallingTextStyle.top = '-.65em';
+        fallingTextStyle.transitionTimingFunction = 'ease-out';
+        fallingTextStyle.transform = 'scaleY(1)';
+      }, DepartureBoard.Letter.DROP_TIME / 2);
+
+      window.setTimeout(function () {
+        me._bottomText.innerHTML = newValue;
+        fallingStyle.display = 'none';
+        fallingStyle.top = 'auto';
+        fallingStyle.bottom = 0;
+        fallingTextStyle.top = 0;
+      }, DepartureBoard.Letter.DROP_TIME);
+
+      if (this._index === this._stopAt) {
+        clearInterval(this._interval);
+        delete this._interval;
+      }
+    };
+
+    /* ==========================================================
+        APP LOGIC & RADAR HUD & SPARKLINE
+        ========================================================== */
+
+    const ROW_CHARS = 30;
+    const ROW_COUNT = 8;
+    const CACHE_DURATION_MS = 15000;
+
+    let myLat = null, myLon = null;
+    let locationLabel = '';
+    let boards = [];
+    let refreshInterval = null;
+    let cycleInterval = null;
+    let globalAcList = [];
+    let currentAcIndex = 0;
+    let isPaused = false;
+
+    const apiCache = { key: null, timestamp: 0, data: null };
+
+    function pad(str, len) {
+      str = String(str);
+      while (str.length < len) str = str + ' ';
+      return str.substring(0, len);
+    }
+
+    function createBoard(chars) {
+      const div = document.createElement('div');
+      const board = new DepartureBoard(div, { rowCount: 1, letterCount: chars });
+      return { div, board };
+    }
+
+    function initBoards() {
+      const container = document.getElementById('board-container');
+      for (var i = 0; i < ROW_COUNT; i++) {
+        const b = createBoard(ROW_CHARS);
+        container.appendChild(b.div);
+        boards.push(b);
+      }
+    }
+
+    function setRow(index, text) {
+      if (index >= 0 && index < ROW_COUNT) {
+        boards[index].board.setValueInstant([pad(text, ROW_CHARS)]);
+      }
+    }
+
+    function animateRow(index, text) {
+      if (index >= 0 && index < ROW_COUNT) {
+        boards[index].board.setValue([pad(text, ROW_CHARS)]);
+      }
+    }
+
+    function updateLocationIndicator() {
+      const el = document.getElementById('location-indicator');
+      if (locationLabel) {
+        el.textContent = `RADAR: ${locationLabel.toUpperCase()}`;
+      } else if (myLat !== null && myLon !== null) {
+        el.textContent = `RADAR: ${myLat.toFixed(2)}, ${myLon.toFixed(2)}`;
+      } else {
+        el.textContent = `RADAR: ACQUIRING...`;
+      }
+    }
+
+    function updateCompassHeading(track) {
+      const compass = document.getElementById('compass-glyph');
+      if (track !== undefined && track !== null) {
+        compass.style.transform = `rotate(${track}deg)`;
+      }
+    }
+
+    function getCompassDirection(angle) {
+      if (angle === undefined || angle === null) return '';
+      const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      const index = Math.round((angle % 360) / 22.5);
+      return directions[index % 16];
+    }
+
+    function updateRadarHUD() {
+      const container = document.getElementById('radar-blips-container');
+      container.innerHTML = '';
+
+      if (!globalAcList || globalAcList.length === 0) return;
+
+      const maxDist = 50; // 50 NM radar range
+      const hudRadius = 60; // Larger radius for 130px container (center is 65px)
+
+      globalAcList.slice(0, 20).forEach((ac, idx) => {
+        if (ac.dst === undefined || ac.track === undefined || ac.lat === undefined || ac.lon === undefined) return;
+
+        const bearingRad = ((ac.track || 0) * Math.PI) / 180;
+        const distRatio = Math.min(ac.dst / maxDist, 1.0);
+        const r = distRatio * hudRadius;
+
+        const x = 65 + r * Math.sin(bearingRad);
+        const y = 65 - r * Math.cos(bearingRad);
+
+        const blip = document.createElement('div');
+        blip.className = 'radar-blip';
+        if (idx === currentAcIndex) blip.classList.add('active');
+        blip.style.left = `${x}px`;
+        blip.style.top = `${y}px`;
+        container.appendChild(blip);
+      });
+    }
+
+    function displayAircraft(ac) {
+      if (!ac) {
+        animateRow(1, 'SCANNING LOCAL AIRSPACE...');
+        animateRow(2, 'NO TRANSPONDERS FOUND (50NM)');
+        animateRow(3, '');
+        animateRow(4, '');
+        animateRow(5, '');
+        setRow(7, 'FEED: AIRPLANES.LIVE NETWORK');
+        updateCompassHeading(0);
+        updateRadarHUD();
+        return;
+      }
+
+      updateCompassHeading(ac.track);
+      updateRadarHUD();
+
+      var row2 = '';
+      if (ac.hex) row2 += ac.hex.toUpperCase();
+      if (ac.flight) { if (row2) row2 += ' '; row2 += ac.flight.trim(); }
+      if (ac.r) { if (row2) row2 += ' '; row2 += ac.r; }
+      if (ac.t) { if (row2) row2 += ' '; row2 += ac.t; }
+      animateRow(1, row2);
+
+      animateRow(2, ac.desc ? ac.desc.substring(0, ROW_CHARS) : '');
+
+      var row4 = '';
+      if (ac.squawk) row4 += 'SQ ' + ac.squawk;
+      if (ac.alt_baro !== undefined && ac.alt_baro !== null) {
+        if (row4) row4 += ' '; row4 += 'ALT ' + Math.round(ac.alt_baro) + 'FT';
+      }
+      if (ac.gs !== undefined && ac.gs !== null) {
+        if (row4) row4 += ' '; row4 += 'GS ' + Math.round(ac.gs) + 'KT';
+      }
+      animateRow(3, row4);
+
+      let verticalTrend = 'CRUISING LEVEL';
+      if (ac.baro_rate > 300) verticalTrend = 'CLIMBING ↑';
+      else if (ac.baro_rate < -300) verticalTrend = 'DESCENDING ↓';
+
+      var row5 = '';
+      if (ac.track !== undefined && ac.track !== null) {
+        row5 += 'HDG ' + Math.round(ac.track) + 'DEG (' + getCompassDirection(ac.track) + ')';
+      }
+      if (ac.dst !== undefined && ac.dst !== null) {
+        if (row5) row5 += ' '; row5 += 'DIST ' + Math.round(ac.dst) + 'NM';
+      }
+      animateRow(4, row5);
+
+      var row6 = verticalTrend;
+      if (ac.ownOp) {
+        row6 += ' | ' + ac.ownOp.substring(0, ROW_CHARS - verticalTrend.length - 3);
+      }
+      animateRow(5, row6);
+
+      let cyclingInfo = globalAcList.length > 1 ? ` [${currentAcIndex + 1}/${Math.min(globalAcList.length, 6)}]` : '';
+      let pauseInfo = isPaused ? ' [PAUSED]' : '';
+      animateRow(6, `LIVE TRACKING${cyclingInfo}${pauseInfo}`);
+      setRow(7, 'FEED: AIRPLANES.LIVE NETWORK');
+    }
+
+    function cycleNextAircraft() {
+      if (globalAcList.length === 0 || isPaused) return;
+      currentAcIndex = (currentAcIndex + 1) % Math.min(globalAcList.length, 6);
+      displayAircraft(globalAcList[currentAcIndex]);
+    }
+
+    function resetCycleTimer() {
+      if (cycleInterval) clearInterval(cycleInterval);
+      if (!isPaused) {
+        cycleInterval = setInterval(cycleNextAircraft, 8000);
+      }
+    }
+
+    async function fetchAircraft() {
+      if (myLat === null || myLon === null) return;
+
+      const cacheKey = `${myLat.toFixed(2)}_${myLon.toFixed(2)}`;
+      const now = Date.now();
+
+      if (apiCache.key === cacheKey && (now - apiCache.timestamp) < CACHE_DURATION_MS && apiCache.data) {
+        processAircraftData(apiCache.data, true);
+        return;
+      }
+
+      try {
+        const url = `https://api.airplanes.live/v2/point/${myLat}/${myLon}/50`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error('API request failed');
+        const data = await resp.json();
+
+        apiCache.key = cacheKey;
+        apiCache.timestamp = now;
+        apiCache.data = data;
+
+        processAircraftData(data, false);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        if (apiCache.data) {
+          processAircraftData(apiCache.data, true);
+          document.getElementById('status').textContent = 'STATUS: OFFLINE (CACHED)';
+        } else {
+          document.getElementById('status').textContent = 'STATUS: NETWORK RETRYING...';
+        }
+      }
+    }
+
+    function processAircraftData(data, isCached) {
+      globalAcList = data.ac || [];
+      globalAcList.sort((a, b) => (a.dst || 9999) - (b.dst || 9999));
+
+      currentAcIndex = 0;
+      displayAircraft(globalAcList.length > 0 ? globalAcList[0] : null);
+
+      const cacheIndicator = isCached ? ' [CACHED]' : '';
+      document.getElementById('status').textContent = `STATUS: ONLINE (${globalAcList.length} TARGETS)${cacheIndicator}`;
+    }
+
+    async function initIPLocationFallback() {
+      try {
+        document.getElementById('status').textContent = 'STATUS: LOCATING VIA IP...';
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        if (data.latitude && data.longitude) {
+          myLat = data.latitude;
+          myLon = data.longitude;
+          locationLabel = data.city ? `${data.city}, ${data.country_code}` : '';
+          updateLocationIndicator();
+          fetchAircraft();
+          refreshInterval = setInterval(fetchAircraft, 30000);
+          resetCycleTimer();
+        } else {
+          throw new Error('Invalid IP location');
+        }
+      } catch (err) {
+        setPreset(40.7128, -74.0060, 'New York (Default)');
+      }
+    }
+
+    /* ==========================================================
+        CONFIG, THEMES & KEYBOARD LISTENERS
+        ========================================================== */
+    var configOpen = false;
+
+    function openConfig() {
+      configOpen = true;
+      document.getElementById('config-overlay').classList.add('visible');
+      document.getElementById('config-lat').value = myLat !== null ? myLat : '';
+      document.getElementById('config-lon').value = myLon !== null ? myLon : '';
+      document.getElementById('config-error').textContent = '';
+    }
+
+    function closeConfig() {
+      configOpen = false;
+      document.getElementById('config-overlay').classList.remove('visible');
+    }
+
+    function changeTheme(themeName) {
+      document.body.className = themeName;
+      localStorage.setItem('boardTheme', themeName);
+    }
+
+    function setPreset(lat, lon, label) {
+      locationLabel = label;
+      document.getElementById('config-lat').value = lat;
+      document.getElementById('config-lon').value = lon;
+      saveConfig();
+    }
+
+    function requestBrowserLocation() {
+      const errorEl = document.getElementById('config-error');
+      if (!navigator.geolocation) {
+        errorEl.textContent = 'Geolocation not supported by browser';
+        return;
+      }
+      errorEl.textContent = 'Acquiring GPS coordinates...';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          locationLabel = 'GPS Location';
+          document.getElementById('config-lat').value = pos.coords.latitude;
+          document.getElementById('config-lon').value = pos.coords.longitude;
+          saveConfig();
+        },
+        (err) => {
+          errorEl.textContent = 'GPS access denied or unavailable';
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+      );
+    }
+
+    function saveConfig() {
+      const lat = parseFloat(document.getElementById('config-lat').value);
+      const lon = parseFloat(document.getElementById('config-lon').value);
+      const errorEl = document.getElementById('config-error');
+
+      if (isNaN(lat) || isNaN(lon)) {
+        errorEl.textContent = 'Please enter valid coordinate numbers';
+        return;
+      }
+      if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        errorEl.textContent = 'Coordinates out of valid bounds';
+        return;
+      }
+
+      localStorage.setItem('customLat', lat.toString());
+      localStorage.setItem('customLon', lon.toString());
+      localStorage.setItem('customLabel', locationLabel);
+
+      myLat = lat;
+      myLon = lon;
+      updateLocationIndicator();
+
+      fetchAircraft();
+      if (refreshInterval) clearInterval(refreshInterval);
+      refreshInterval = setInterval(fetchAircraft, 30000);
+      resetCycleTimer();
+
+      closeConfig();
+    }
+
+    document.getElementById('config-overlay').addEventListener('click', function (e) {
+      if (e.target === this) closeConfig();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        if (configOpen) closeConfig();
+        return;
+      }
+      if (configOpen) return;
+
+      if (e.key === 'ArrowRight') {
+        if (globalAcList.length > 0) {
+          currentAcIndex = (currentAcIndex + 1) % Math.min(globalAcList.length, 6);
+          displayAircraft(globalAcList[currentAcIndex]);
+          resetCycleTimer();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (globalAcList.length > 0) {
+          currentAcIndex = (currentAcIndex - 1 + Math.min(globalAcList.length, 6)) % Math.min(globalAcList.length, 6);
+          displayAircraft(globalAcList[currentAcIndex]);
+          resetCycleTimer();
+        }
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        isPaused = !isPaused;
+        if (isPaused) {
+          if (cycleInterval) clearInterval(cycleInterval);
+        } else {
+          resetCycleTimer();
+        }
+        displayAircraft(globalAcList.length > 0 ? globalAcList[currentAcIndex] : null);
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (refreshInterval) clearInterval(refreshInterval);
+        if (cycleInterval) clearInterval(cycleInterval);
+      } else {
+        fetchAircraft();
+        refreshInterval = setInterval(fetchAircraft, 30000);
+        resetCycleTimer();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(console.error);
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    /* ==========================================================
+        INITIALIZATION
+        ========================================================== */
+    function init() {
+      initBoards();
+      setRow(1, 'FLIGHT-BOARD.LIVE PLATFORM');
+      setRow(2, 'INITIALIZING AIRSPACE RADAR...');
+      setRow(7, 'FEED: AIRPLANES.LIVE NETWORK');
+
+      const savedTheme = localStorage.getItem('boardTheme');
+      if (savedTheme) {
+        document.body.className = savedTheme;
+        document.getElementById('config-theme').value = savedTheme;
+      }
+
+      const savedLat = localStorage.getItem('customLat');
+      const savedLon = localStorage.getItem('customLon');
+      const savedLabel = localStorage.getItem('customLabel');
+
+      if (savedLat !== null && savedLon !== null) {
+        myLat = parseFloat(savedLat);
+        myLon = parseFloat(savedLon);
+        locationLabel = savedLabel || 'Custom Station';
+        updateLocationIndicator();
+        fetchAircraft();
+        refreshInterval = setInterval(fetchAircraft, 30000);
+        resetCycleTimer();
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        initIPLocationFallback();
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          myLat = pos.coords.latitude;
+          myLon = pos.coords.longitude;
+          locationLabel = 'Your Device Location';
+          updateLocationIndicator();
+          fetchAircraft();
+          refreshInterval = setInterval(fetchAircraft, 30000);
+          resetCycleTimer();
+        },
+        (err) => {
+          initIPLocationFallback();
+        },
+        { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 }
+      );
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+
+</html>
