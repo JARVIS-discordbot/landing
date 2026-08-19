@@ -27,9 +27,3 @@ CI runs on pull requests and pushes to `main` when `index.html`, `clusters.html`
 credits: 
 1. @bencos17
 2. @savvythunder for the animations on the landing page and a few other things on that page also
-
-
-
-
-StandWithUkraine:
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
