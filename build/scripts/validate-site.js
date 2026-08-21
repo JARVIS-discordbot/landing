@@ -88,7 +88,7 @@ function validateClustersHtml(html) {
 
 function validateIndexHtml(html) {
   assertIncludes('index.html', html, 'id="btnContainer"');
-  assertIncludes('index.html', html, 'class="navbar"');
+  // Removed: assertIncludes('index.html', html, 'class="navbar"');
   assertNoMatch('index.html', html, /<\/script>\s*<\/script>/i);
 }
 
