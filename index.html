@@ -190,44 +190,59 @@
 
   <main id="top" class="relative">
     <section class="mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pt-16 lg:px-8">
-      <div class="animate-fade-up text-center max-w-4xl mx-auto">
-        <div
-          class="mb-6 inline-flex items-center rounded-full border border-brand-400/30 bg-brand-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-100">
-          Powerful Discord server management
-        </div>
-        <h1 class="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Jarvis Discord Bot
-          <span class="block bg-gradient-to-r from-brand-300 via-sky-300 to-brand-500 bg-clip-text text-transparent">
-            Your Ultimate Discord Companion
-          </span>
-        </h1>
-        <p class="mt-6 text-lg leading-8 text-slate-300 sm:text-xl">
-          The best bot for your Discord server. Easy to use, packed with features, and always reliable.
-          Manage your community, explore commands, monitor service status, and get quick access to the Jarvis tools
-          your server depends on.
-        </p>
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
+        <div class="animate-fade-up">
+          <div
+            class="mb-6 inline-flex items-center rounded-full border border-brand-400/30 bg-brand-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-100">
+            Powerful Discord server management
+          </div>
+          <h1 class="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Jarvis Discord Bot
+            <span class="block bg-gradient-to-r from-brand-300 via-sky-300 to-brand-500 bg-clip-text text-transparent">
+              Your Ultimate Discord Companion
+            </span>
+          </h1>
+          <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl">
+            The best bot for your Discord server. Easy to use, packed with features, and always reliable.
+            Manage your community, explore commands, monitor service status, and get quick access to the Jarvis tools
+            your server depends on.
+          </p>
 
-        <div class="mt-8 grid gap-4 sm:grid-cols-3 text-left">
-          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-            <p class="text-sm font-semibold text-white">Fast setup</p>
-            <p class="mt-2 text-sm leading-6 text-slate-300">Invite Jarvis and start using moderation, utility, and
-              server tools in minutes.</p>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-            <p class="text-sm font-semibold text-white">Helpful dashboard</p>
-            <p class="mt-2 text-sm leading-6 text-slate-300">Manage your bot settings, review commands, and access
-              live service information.</p>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-            <p class="text-sm font-semibold text-white">Reliable ecosystem</p>
-            <p class="mt-2 text-sm leading-6 text-slate-300">Support, status, cluster visibility, and useful companion
-              tools are all one click away.</p>
+          <div class="mt-8 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Fast setup</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Invite Jarvis and start using moderation, utility, and
+                server tools in minutes.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Helpful dashboard</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Manage your bot settings, review commands, and access
+                live service information.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm font-semibold text-white">Reliable ecosystem</p>
+              <p class="mt-2 text-sm leading-6 text-slate-300">Support, status, cluster visibility, and useful companion
+                tools are all one click away.</p>
+            </div>
           </div>
         </div>
 
-        <!-- Quick Links Buttons (Centered & Even Grid) -->
-        <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" id="btnContainer" aria-label="Jarvis quick links">
-        </div>
+        <aside
+          class="animate-fade-up rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl"
+          style="animation-delay: 0.12s;">
+          <div class="flex flex-col items-center text-center">
+            <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif"
+              alt="Jarvis Discord Bot Avatar"
+              class="h-32 w-32 animate-float rounded-full border-4 border-brand-400/30 object-cover shadow-glow sm:h-36 sm:w-36">
+            <h2 class="mt-5 text-2xl font-bold text-white">Ready to add Jarvis?</h2>
+            <p class="mt-3 max-w-sm text-sm leading-6 text-slate-300">
+              Use the quick links below to invite the bot, open the dashboard, join support, or explore Jarvis
+              resources.
+            </p>
+          </div>
+
+          <div class="mt-8 grid gap-4" id="btnContainer" aria-label="Jarvis quick links"></div>
+        </aside>
       </div>
     </section>
 
