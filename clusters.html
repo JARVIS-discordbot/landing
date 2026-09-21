@@ -5,18 +5,23 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta name="description"
+    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
   <meta name="author" content="Jarvis Discord Bot Team" />
   <link rel="canonical" href="https://clusters.jarvisdiscordbot.net/" />
   <meta property="og:title" content="Jarvis Bot - Cluster Status" />
-  <meta property="og:description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta property="og:description"
+    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://clusters.jarvisdiscordbot.net/" />
-  <meta property="og:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
+  <meta property="og:image"
+    content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Jarvis Bot - Cluster Status" />
-  <meta name="twitter:description" content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
-  <meta name="twitter:image" content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
+  <meta name="twitter:description"
+    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+  <meta name="twitter:image"
+    content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
   <title>Jarvis Bot - Cluster Status</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNS0C9K0YJ"></script>
   <script>
@@ -399,6 +404,55 @@
       line-height: 1.45;
     }
 
+    .uptime-history {
+      margin-top: 28px;
+    }
+
+    .uptime-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-panel), rgba(18, 32, 58, 0.5));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .uptime-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .uptime-table th,
+    .uptime-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(139, 168, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    .uptime-table th {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .uptime-table td {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .uptime-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .uptime-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
     .progress-wrapper {
       margin-top: 14px;
       height: 8px;
@@ -771,15 +825,18 @@
   <nav class="navbar">
     <div class="nav-container">
       <a href="https://jarvisdiscordbot.net/" class="nav-logo">
-        <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" alt="Jarvis Bot" class="nav-avatar">
+        <img src="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif"
+          alt="Jarvis Bot" class="nav-avatar">
         <span>Jarvis Bot</span>
       </a>
       <div class="nav-links" id="navLinks">
         <a href="https://jarvisdiscordbot.net/" class="nav-link">Home</a>
         <a href="https://dash.jarvisdiscordbot.net/" class="nav-link">Dashboard</a>
         <a href="https://dash.jarvisdiscordbot.net/commands" class="nav-link">Commands</a>
-        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" rel="noopener noreferrer" class="nav-link">Support</a>
-        <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer" class="nav-link">Status</a>
+        <a href="https://discord.com/invite/WW4eNQj9qr" target="_blank" rel="noopener noreferrer"
+          class="nav-link">Support</a>
+        <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer"
+          class="nav-link">Status</a>
         <a href="https://clusters.jarvisdiscordbot.net/" class="nav-link is-active" aria-current="page">Cluster Info</a>
       </div>
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
@@ -798,7 +855,8 @@
     </header>
 
     <div class="status-bar" aria-live="polite" aria-atomic="true">
-      <div class="status-pill is-loading" id="sync-pill"><span class="status-dot" aria-hidden="true"></span><span id="sync-status">Awaiting cluster telemetry</span>
+      <div class="status-pill is-loading" id="sync-pill"><span class="status-dot" aria-hidden="true"></span><span
+          id="sync-status">Awaiting cluster telemetry</span>
       </div>
       <div class="status-text" id="sync-detail">Last refresh: --</div>
     </div>
@@ -840,7 +898,8 @@
         <div class="stat-box">
           <div class="stat-label">Bot Memory</div>
           <div class="stat-value" id="bot-ram-val">--</div>
-          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Bot memory usage">
+          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+            aria-label="Bot memory usage">
             <div id="bot-ram-bar" class="progress-fill"></div>
           </div>
           <div class="stat-subvalue" id="bot-ram-detail">Process RSS and configured limit</div>
@@ -848,7 +907,8 @@
         <div class="stat-box">
           <div class="stat-label">System RAM</div>
           <div class="stat-value" id="ram-val">--</div>
-          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="System RAM usage">
+          <div class="progress-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+            aria-label="System RAM usage">
             <div id="ram-bar" class="progress-fill"></div>
           </div>
           <div class="stat-subvalue" id="swap-val">Swap: --</div>
@@ -857,6 +917,15 @@
           <div class="stat-label">Total Servers</div>
           <div class="stat-value" id="total-servers">--</div>
           <div class="stat-subvalue" id="total-users">Total users: --</div>
+        </div>
+      </div>
+      <div class="uptime-history">
+        <div class="section-title">
+          <h2>Uptime History</h2>
+          <span id="uptime-history-count">0 samples</span>
+        </div>
+        <div class="uptime-table-wrapper" id="uptime-history-table">
+          <div class="empty-state">No uptime history was returned by the endpoint.</div>
         </div>
       </div>
     </section>
@@ -933,6 +1002,54 @@
 
     function formatPercent(value) {
       return `${formatNumber(value, 1)}%`;
+    }
+
+    function formatDuration(seconds) {
+      const totalSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const remainingSeconds = totalSeconds % 60;
+      const parts = [];
+
+      if (days) parts.push(`${days}d`);
+      if (hours || parts.length) parts.push(`${hours}h`);
+      if (minutes || parts.length) parts.push(`${minutes}m`);
+      parts.push(`${remainingSeconds}s`);
+      return parts.join(' ');
+    }
+
+    function renderUptimeHistory(history) {
+      const container = document.getElementById('uptime-history-table');
+      const count = document.getElementById('uptime-history-count');
+      const entries = Array.isArray(history) ? history.filter(entry => entry && entry.timestamp) : [];
+
+      count.innerText = `${entries.length} sample${entries.length === 1 ? '' : 's'}`;
+      if (!entries.length) {
+        container.innerHTML = '<div class="empty-state">No uptime history was returned by the endpoint.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="uptime-table">
+          <thead>
+            <tr>
+              <th scope="col">Recorded</th>
+              <th scope="col">Bot Uptime</th>
+              <th scope="col">Server Uptime</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${entries.map(entry => `
+              <tr>
+                <td>${escapeHtml(new Date(Number(entry.timestamp) * 1000).toLocaleString())}</td>
+                <td>${escapeHtml(formatDuration(entry.bot_uptime_seconds))}</td>
+                <td>${escapeHtml(formatDuration(entry.server_uptime_seconds))}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
     }
 
     function escapeHtml(value) {
@@ -1024,6 +1141,7 @@
       document.getElementById('total-servers').innerText = '--';
       document.getElementById('total-users').innerText = 'Total users: --';
       document.getElementById('cluster-count').innerText = '0 clusters';
+      renderUptimeHistory([]);
 
       updateMetricBar('bot-ram-bar', 0, 1);
       updateMetricBar('ram-bar', 0, 1);
@@ -1453,6 +1571,7 @@
         const sys = data.system_stats || {};
         const clusterList = Array.isArray(data.clusters) ? data.clusters : [];
         latestClusterList = clusterList;
+        renderUptimeHistory(data.uptime_history);
 
         const cpuPercent = Number(sys.cpu_total_percent ?? sys.cpu_usage_percent ?? 0);
         const ramUsed = Number(sys.ram_used_gb ?? 0);
