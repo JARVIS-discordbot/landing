@@ -1019,6 +1019,17 @@
       return parts.join(' ');
     }
 
+    function formatClusterHistory(clusterUptime) {
+      if (!clusterUptime || typeof clusterUptime !== 'object') {
+        return 'Not reported';
+      }
+
+      const entries = Object.entries(clusterUptime);
+      return entries.length
+        ? entries.map(([shardId, seconds]) => `Shard ${shardId}: ${formatDuration(seconds)}`).join(' | ')
+        : 'Not reported';
+    }
+
     function renderUptimeHistory(history) {
       const container = document.getElementById('uptime-history-table');
       const count = document.getElementById('uptime-history-count');
@@ -1037,6 +1048,7 @@
               <th scope="col">Recorded</th>
               <th scope="col">Bot Uptime</th>
               <th scope="col">Server Uptime</th>
+              <th scope="col">Cluster Uptime</th>
             </tr>
           </thead>
           <tbody>
@@ -1045,6 +1057,7 @@
                 <td>${escapeHtml(new Date(Number(entry.timestamp) * 1000).toLocaleString())}</td>
                 <td>${escapeHtml(formatDuration(entry.bot_uptime_seconds))}</td>
                 <td>${escapeHtml(formatDuration(entry.server_uptime_seconds))}</td>
+                <td>${escapeHtml(formatClusterHistory(entry.cluster_uptime_seconds))}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -1510,6 +1523,7 @@
         const shardId = cluster.shard_id ?? index;
         const color = getClusterColor(shardId);
         const latency = Number(cluster.latency_ms ?? 0);
+        const clusterUptime = cluster.uptime || formatDuration(cluster.uptime_seconds);
         const servers = Number(cluster.servers ?? 0);
         const users = Number(cluster.users ?? 0);
         const density = servers > 0 ? (users / servers).toFixed(0) : '0';
@@ -1543,6 +1557,10 @@
           <div class="cluster-stat">
             <div class="cluster-stat-label">Latency</div>
             <div class="cluster-stat-value">${formatNumber(latency, 0)} ms</div>
+          </div>
+          <div class="cluster-stat">
+            <div class="cluster-stat-label">Uptime</div>
+            <div class="cluster-stat-value">${escapeHtml(clusterUptime)}</div>
           </div>
         </div>
       `;
