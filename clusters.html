@@ -1072,9 +1072,13 @@
     function renderUptimeHistory(history) {
       const container = document.getElementById('uptime-history-table');
       const count = document.getElementById('uptime-history-count');
-      const entries = Array.isArray(history) ? history.filter(entry => entry && entry.timestamp) : [];
+      const historyEntries = Array.isArray(history) ? history.filter(entry => entry && entry.timestamp) : [];
+      const latestEntry = historyEntries.reduce((latest, entry) => (
+        !latest || Number(entry.timestamp) > Number(latest.timestamp) ? entry : latest
+      ), null);
+      const entries = latestEntry ? [latestEntry] : [];
 
-      count.innerText = `${entries.length} sample${entries.length === 1 ? '' : 's'}`;
+      count.innerText = latestEntry ? 'Latest snapshot' : '0 samples';
       if (!entries.length) {
         container.innerHTML = '<div class="empty-state">No uptime history was returned by the endpoint.</div>';
         return;
