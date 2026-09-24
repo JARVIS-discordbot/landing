@@ -53,6 +53,18 @@
       box-sizing: border-box;
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -226,6 +238,87 @@
     .status-text {
       color: var(--muted);
       font-size: 0.95rem;
+    }
+
+    .server-lookup {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg-elevated), rgba(18, 32, 58, 0.6));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .lookup-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .lookup-heading h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .lookup-heading span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .lookup-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .lookup-input {
+      min-width: 0;
+      flex: 1;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(4, 10, 22, 0.6);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .lookup-input:focus,
+    .lookup-button:focus-visible {
+      outline: 2px solid var(--accent-strong);
+      outline-offset: 2px;
+    }
+
+    .lookup-button {
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #5f7de0);
+      color: #07111f;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lookup-button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .lookup-result {
+      min-height: 1.3em;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .lookup-result.is-success {
+      color: #aef3eb;
+    }
+
+    .lookup-result.is-error {
+      color: #ffc3c3;
     }
 
     .tabs {
@@ -849,6 +942,10 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .lookup-form {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -892,6 +989,20 @@
       </div>
       <div class="status-text" id="sync-detail">Last refresh: --</div>
     </div>
+
+    <section class="server-lookup" aria-labelledby="server-lookup-title">
+      <div class="lookup-heading">
+        <h2 id="server-lookup-title">Find a server</h2>
+        <span>Look up its hosting shard</span>
+      </div>
+      <form class="lookup-form" id="server-lookup-form">
+        <label class="sr-only" for="server-id">Discord server ID</label>
+        <input class="lookup-input" id="server-id" name="server_id" type="text" inputmode="numeric" autocomplete="off"
+          minlength="17" maxlength="20" pattern="[0-9]{17,20}" placeholder="Enter Discord server ID" required>
+        <button class="lookup-button" type="submit">Find shard</button>
+      </form>
+      <div class="lookup-result" id="server-lookup-result" aria-live="polite" role="status"></div>
+    </section>
 
     <div class="tabs" role="tablist" aria-label="Cluster dashboard sections">
       <button class="tab-button" type="button" role="tab" id="tab-overview" aria-controls="panel-overview"
@@ -1051,6 +1162,44 @@
       if (minutes) parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
       if (remainingSeconds || !parts.length) parts.push(`${remainingSeconds} second${remainingSeconds === 1 ? '' : 's'}`);
       return parts.join(' ');
+    }
+
+    function setLookupResult(message, state = '') {
+      const result = document.getElementById('server-lookup-result');
+      result.className = `lookup-result${state ? ` is-${state}` : ''}`;
+      result.innerText = message;
+    }
+
+    async function lookupServer(serverId) {
+      const button = document.querySelector('#server-lookup-form button');
+      button.disabled = true;
+      setLookupResult('Looking up server shard...');
+
+      try {
+        const params = new URLSearchParams({ server_id: serverId });
+        const response = await fetch(`/clusters?${params.toString()}`, { cache: 'no-store' });
+        let payload = {};
+        try {
+          payload = await response.json();
+        } catch (error) {
+          // Fall back to the HTTP status when the API does not return JSON.
+        }
+
+        if (!response.ok) {
+          const detail = payload.detail || payload.message || `Request failed (HTTP ${response.status})`;
+          throw new Error(detail);
+        }
+
+        if (payload.server_id === undefined || payload.shard_id === undefined) {
+          throw new Error('The endpoint returned an incomplete server mapping.');
+        }
+
+        setLookupResult(`Server ${payload.server_id} is hosted on shard ${payload.shard_id}.`, 'success');
+      } catch (error) {
+        setLookupResult(error.message || 'Unable to look up that server.', 'error');
+      } finally {
+        button.disabled = false;
+      }
     }
 
     function formatClusterHistory(clusterUptime) {
@@ -1550,6 +1699,17 @@
       event.preventDefault();
       setActiveTab(tabs[nextIndex].dataset.tab);
       tabs[nextIndex].focus();
+    });
+
+    document.getElementById('server-lookup-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('server-id');
+      if (!input.checkValidity()) {
+        input.reportValidity();
+        setLookupResult('Enter a valid Discord server ID (17 to 20 digits).', 'error');
+        return;
+      }
+      lookupServer(input.value.trim());
     });
 
     function renderClusterCards(clusterList) {
