@@ -71,6 +71,9 @@ function validateClustersHtml(html) {
     'ram-bar',
     'navToggle',
     'navLinks',
+    'server-lookup-form',
+    'server-id',
+    'server-lookup-result',
   ];
 
   for (const id of requiredIds) {
@@ -78,6 +81,8 @@ function validateClustersHtml(html) {
   }
 
   assertIncludes('clusters.html', html, 'fetch(\'/clusters\'');
+  assertIncludes('clusters.html', html, 'server_id: serverId');
+  assertIncludes('clusters.html', html, 'payload.shard_id');
   assertIncludes('clusters.html', html, 'function setSyncState');
   assertIncludes('clusters.html', html, 'function ensureChartJs');
   assertIncludes('clusters.html', html, 'function syncGauges');
