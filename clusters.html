@@ -6,23 +6,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+    content="Live shard telemetry for Jarvis Discord Bot — uptime, system health, and server distribution." />
   <meta name="author" content="Jarvis Discord Bot Team" />
   <link rel="canonical" href="https://clusters.jarvisdiscordbot.net/" />
-  <meta property="og:title" content="Jarvis Bot - Cluster Status" />
+  <meta property="og:title" content="Jarvis Bot - Shard Status" />
   <meta property="og:description"
-    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+    content="Live shard telemetry for Jarvis Discord Bot — uptime, system health, and server distribution." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://clusters.jarvisdiscordbot.net/" />
   <meta property="og:image"
     content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Jarvis Bot - Cluster Status" />
+  <meta name="twitter:title" content="Jarvis Bot - Shard Status" />
   <meta name="twitter:description"
-    content="Live cluster telemetry for Jarvis Discord Bot — uptime, system health, and shard status." />
+    content="Live shard telemetry for Jarvis Discord Bot — uptime, system health, and server distribution." />
   <meta name="twitter:image"
     content="https://cdn.discordapp.com/avatars/603939742316363778/a_06976bd73730bd53f7177099a1a1b588.gif" />
-  <title>Jarvis Bot - Cluster Status</title>
+  <title>Jarvis Bot - Shard Status</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNS0C9K0YJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -966,7 +966,7 @@
           class="nav-link">Support</a>
         <a href="https://status.jarvisdiscordbot.net/" target="_blank" rel="noopener noreferrer"
           class="nav-link">Status</a>
-        <a href="https://clusters.jarvisdiscordbot.net/" class="nav-link is-active" aria-current="page">Cluster Info</a>
+        <a href="https://clusters.jarvisdiscordbot.net/" class="nav-link is-active" aria-current="page">Shard Info</a>
       </div>
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -977,15 +977,15 @@
   <div class="shell">
     <header class="hero">
       <div class="eyebrow">Jarvis Discord Bot</div>
-      <h1>Cluster Status</h1>
+      <h1>Shard Status</h1>
       <p class="subtitle">Live service telemetry from the <strong>/clusters</strong> endpoint, including uptime,
-        machine health, and shard-level cluster data.
+        machine health, and shard-level server data.
       </p>
     </header>
 
     <div class="status-bar" aria-live="polite" aria-atomic="true">
       <div class="status-pill is-loading" id="sync-pill"><span class="status-dot" aria-hidden="true"></span><span
-          id="sync-status">Awaiting cluster telemetry</span>
+          id="sync-status">Awaiting shard telemetry</span>
       </div>
       <div class="status-text" id="sync-detail">Last refresh: --</div>
     </div>
@@ -1004,7 +1004,7 @@
       <div class="lookup-result" id="server-lookup-result" aria-live="polite" role="status"></div>
     </section>
 
-    <div class="tabs" role="tablist" aria-label="Cluster dashboard sections">
+    <div class="tabs" role="tablist" aria-label="Shard dashboard sections">
       <button class="tab-button" type="button" role="tab" id="tab-overview" aria-controls="panel-overview"
         aria-selected="true" data-tab="overview">Overview</button>
       <button class="tab-button" type="button" role="tab" id="tab-system" aria-controls="panel-system"
@@ -1012,7 +1012,7 @@
       <button class="tab-button" type="button" role="tab" id="tab-latency" aria-controls="panel-latency"
         aria-selected="false" data-tab="latency">Latency</button>
       <button class="tab-button" type="button" role="tab" id="tab-clusters" aria-controls="panel-clusters"
-        aria-selected="false" data-tab="clusters">Clusters</button>
+        aria-selected="false" data-tab="clusters">Shards</button>
     </div>
 
     <section class="tab-panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
@@ -1083,7 +1083,7 @@
 
     <section class="tab-panel" id="panel-latency" role="tabpanel" aria-labelledby="tab-latency" hidden>
       <div class="section-title">
-        <h2>Cluster Latency</h2>
+        <h2>Shard Latency</h2>
         <span>Each shard is updated from the latest API response.</span>
       </div>
       <div class="gauge-section" id="gauge-area"></div>
@@ -1091,13 +1091,13 @@
 
     <section class="tab-panel" id="panel-clusters" role="tabpanel" aria-labelledby="tab-clusters" hidden>
       <div class="section-title">
-        <h2>Clusters</h2>
-        <span id="cluster-count">0 clusters</span>
+        <h2>Shards</h2>
+        <span id="cluster-count">0 shards</span>
       </div>
       <div class="cluster-container" id="clusters"></div>
     </section>
 
-    <footer>&copy; 2026 Jarvis Discord Bot | <a href="https://jarvisdiscordbot.net/">Back to home</a> | Live cluster
+    <footer>&copy; 2026 Jarvis Discord Bot | <a href="https://jarvisdiscordbot.net/">Back to home</a> | Live shard
       telemetry</footer>
   </div>
 
@@ -1240,7 +1240,7 @@
               <th scope="col">Recorded</th>
               <th scope="col">Bot Uptime</th>
               <th scope="col">Server Uptime</th>
-              <th scope="col">Cluster Uptime</th>
+              <th scope="col">Shard Uptime</th>
             </tr>
           </thead>
           <tbody>
@@ -1345,7 +1345,7 @@
       document.getElementById('swap-val').innerText = 'Swap: --';
       document.getElementById('total-servers').innerText = '--';
       document.getElementById('total-users').innerText = 'Total users: --';
-      document.getElementById('cluster-count').innerText = '0 clusters';
+      document.getElementById('cluster-count').innerText = '0 shards';
       renderUptimeHistory([]);
 
       updateMetricBar('bot-ram-bar', 0, 1);
@@ -1447,7 +1447,7 @@
 
       const gaugeArea = document.getElementById('gauge-area');
       if (clusterList.length === 0 && gaugeRegistry.size === 0) {
-        gaugeArea.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
+        gaugeArea.innerHTML = '<div class="empty-state">No shard data was returned by the endpoint.</div>';
       } else {
         const emptyState = gaugeArea.querySelector('.empty-state');
         if (emptyState) {
@@ -1538,7 +1538,7 @@
       addDetailRow(topRows, 'API Version', apiVersion ?? 'Not reported');
       addDetailRow(topRows, 'Bot Uptime', data.bot_uptime);
       addDetailRow(topRows, 'Server Uptime', data.server_uptime);
-      addDetailRow(topRows, 'Clusters Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
+      addDetailRow(topRows, 'Shards Reported', Array.isArray(data.clusters) ? data.clusters.length : 0);
       addDetailRow(topRows, 'Core Summary', coreInfo.summary);
       addDetailRow(topRows, 'Core Source', coreInfo.source);
       addDetailRow(topRows, 'Missing Core Fields', coreInfo.missing.length ? coreInfo.missing.join(', ') : 'None');
@@ -1716,8 +1716,8 @@
       const clusterContainer = document.getElementById('clusters');
 
       if (clusterList.length === 0) {
-        clusterContainer.innerHTML = '<div class="empty-state">No cluster data was returned by the endpoint.</div>';
-        document.getElementById('cluster-count').innerText = '0 clusters';
+        clusterContainer.innerHTML = '<div class="empty-state">No shard data was returned by the endpoint.</div>';
+        document.getElementById('cluster-count').innerText = '0 shards';
         return;
       }
 
@@ -1772,7 +1772,7 @@
         clusterContainer.appendChild(card);
       });
 
-      document.getElementById('cluster-count').innerText = `${clusterList.length} cluster${clusterList.length === 1 ? '' : 's'}`;
+      document.getElementById('cluster-count').innerText = `${clusterList.length} shard${clusterList.length === 1 ? '' : 's'}`;
     }
 
     async function loadClusters() {
@@ -1780,7 +1780,7 @@
       const shell = document.querySelector('.shell');
       const hadData = latestClusterList.length > 0;
 
-      setSyncState('loading', hadData ? 'Refreshing telemetry' : 'Loading telemetry', 'Fetching latest data from /clusters');
+      setSyncState('loading', hadData ? 'Refreshing telemetry' : 'Loading telemetry', 'Fetching latest shard data from /clusters');
       shell.classList.add('is-loading');
 
       try {
@@ -1851,7 +1851,7 @@
           return;
         }
 
-        console.error('Failed to load cluster telemetry', err);
+        console.error('Failed to load shard telemetry', err);
         const errorDetail = err && err.message ? err.message : 'Unable to reach /clusters right now';
         clearTelemetryDisplay(errorDetail);
         setSyncState('error', 'Telemetry unavailable', errorDetail);
